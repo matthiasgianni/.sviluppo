@@ -1,0 +1,18 @@
+{
+  "Configuration": [
+    {
+      "ConfigName": "PLC",
+      "Parameters": [
+        {"Name": "Ip", "Value": "192.168.0.1"},
+        {"Name": "Rack", "Value": "0"},
+        {"Name": "Slot", "Value": "1"}
+      ]
+    },
+    {
+      "ConfigName": "Info",
+      "Parameters": [
+        {"Name": "SWName", "Value": "12"}
+      ]
+    }
+  ]
+}
