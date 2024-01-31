@@ -36,7 +36,7 @@ begin
   FDMPLC := TDMPLC.Create(nil);
 
   if FDMPLC.PLC.Connected then
-    LogStatus(pnlStatus, 'Connessione al plc avvenuta correttamente', ltOk)
+    LogStatus(pnlStatus, 'Connessione al plc avvenuta correttamente!', ltOk)
   else
   begin
     LogStatus(pnlStatus, 'Impossibile connettersi al plc', ltError);
