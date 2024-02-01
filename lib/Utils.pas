@@ -5,9 +5,10 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.JSON, System.IOUtils,
-  System.Generics.Collections;
+  System.Generics.Collections, UInfoForm;
 
 type
+  TSignalType = (stBool, stInt);
   TLogType = (ltOk, ltWarning, ltError);
 
   TParameter = record
@@ -20,16 +21,84 @@ type
     Parameters: TArray<TParameter>;
   end;
 
+  TAutomationControl = class(TPanel)
+  private
+    FSignalType: TSignalType;
+    FSignalID: Integer;
+    FState: Boolean;
+  protected
+    procedure Paint; override;
+  public
+    procedure SetState(const Value: Boolean);
+    constructor Create(AOwner: TComponent); override;
+  published
+    property SignalID: Integer read FSignalID write FSignalID;
+    property State: Boolean read FState write SetState default False;
+  end;
+
   procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
   function IntToBool(const AValue: Integer): Boolean;
+
+  // JSON METHODS
   procedure LoadConfigurations;
   function GetConfiguration(const ConfigName: string): TConfigSettings;
   function GetParameterValue(const Config: TConfigSettings; const ParamName: string): string;
+
+  procedure ShowCustomMessageForm(AType: TLogType; const AMessage: String);
 
 var
   Configurations: array of TConfigSettings;
 
 implementation
+
+constructor TAutomationControl.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+
+  // Stato predefinito
+  FState := False;
+
+  // Dimensioni
+  Self.Width := 100;
+  Self.Height := 25;
+
+  // Posizionamento
+  AlignWithMargins := True;
+  Margins.Left := 10;
+  Margins.Top := 10;
+
+  // Stili
+  ParentBackground := False;
+  BevelOuter := bvNone;
+  BevelInner := bvNone;
+  BevelKind := bkNone;
+  Font.Name := 'Open Sans';
+  Font.Size := 10;
+  Font.Style := [fsBold];
+end;
+
+procedure TAutomationControl.SetState(const Value: Boolean);
+begin
+  if FState <> Value then
+  begin
+    FState := Value;
+    Repaint;
+  end;
+end;
+
+procedure TAutomationControl.Paint;
+begin
+  inherited Paint;
+  if FState then
+    Color := $005CB85C
+  else
+  begin
+    Font.Color := clWhite;
+    Color := $003F3FE4;
+  end;
+
+  Caption := UpperCase(Caption);
+end;
 
 procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
 var
@@ -42,7 +111,7 @@ begin
     Exit;
 
   if ALogType = ltOk then
-    LColor := clWebBlue
+    LColor := $00E06666
   else if ALogType = ltWarning then
     LColor := clWebOrange
   else if ALogType = ltError then
@@ -164,5 +233,25 @@ begin
   end;
 end;
 
+procedure ShowCustomMessageForm(AType: TLogType; const AMessage: String);
+var
+  LForm: TInfoForm;
+  LIconID: Integer;
+begin
+  LForm := TInfoForm.Create(Application);
+  try
+    case AType of
+      ltOk: LIconID := 0;
+      ltWarning: LIconID := 1;
+      ltError: LIconID := 2;
+    end;
+
+    LForm.SetIcon(LIconID);
+    LForm.SetMessage(AMessage);
+    LForm.ShowModal;
+  finally
+    LForm.Free;
+  end;
+end;
 
 end.

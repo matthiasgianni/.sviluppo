@@ -24,6 +24,7 @@ object FormDebug: TFormDebug
     TabOrder = 0
   end
   object TimerDebug: TTimer
+    Enabled = False
     OnTimer = TimerDebugTimer
     Left = 568
     Top = 24

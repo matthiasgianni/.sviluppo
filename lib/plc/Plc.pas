@@ -30,6 +30,7 @@ type
     FPLCRack: Integer;
     FPLCSlot: Integer;
   public
+    property PLCIp: String read FPLCIp write FPLCIp;
     property Connected: Boolean read FConnected write FConnected;
 
     procedure Disconnect;

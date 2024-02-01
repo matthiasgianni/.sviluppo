@@ -17,9 +17,8 @@ type
     FDMPLC: TDMPLC;
     Config: TConfigSettings;
 
-    procedure GenerateDebugControls;
-    procedure RefreshDebugControls;
-    procedure RefreshDebug;
+    procedure GenerateAutomationControls;
+    procedure RefreshAutomationControls;
   public
     { Public declarations }
   end;
@@ -33,70 +32,70 @@ implementation
 
 procedure TFormDebug.FormCreate(Sender: TObject);
 begin
+  TimerDebug.Enabled := False;
   FDMPLC := TDMPLC.Create(nil);
 
   if FDMPLC.PLC.Connected then
-    LogStatus(pnlStatus, 'Connessione al plc avvenuta correttamente!', ltOk)
-  else
   begin
-    LogStatus(pnlStatus, 'Impossibile connettersi al plc', ltError);
+    TimerDebug.Enabled := True;
+    ShowCustomMessageForm(ltOk, 'Connessione al plc eseguita correttamente');
+  end else
+  begin
+    ShowCustomMessageForm(ltError, 'Impossibile stabilire una connessione con il plc ' + FDMPLC.PLC.PLCIp);
     Exit;
   end;
 
-  GenerateDebugControls;
-  RefreshDebug;
+  GenerateAutomationControls;
+  RefreshAutomationControls;
 end;
 
-procedure TFormDebug.GenerateDebugControls;
+procedure TFormDebug.GenerateAutomationControls;
 var
   LSignal: TSignal;
 begin
+  if not FDMPLC.PLC.Connected then
+    Exit;
+
   for LSignal in FDMPLC.SignalCollection do
   begin
-    with TCheckBox.Create(Self) do
+    with TAutomationControl.Create(Self) do
     begin
       Parent := Self;
       Align := alTop;
-      AlignWithMargins := True;
-      Margins.Left := 10;
-      Margins.Top := 10;
-      Name := 'DEBUGCONTROL_' + IntToStr(LSignal.SignalIndex);
+      Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
       Caption := LSignal.Name;
-      Checked := False;
-      Tag := LSignal.SignalIndex;
+      SignalID := LSignal.SignalIndex;
     end;
   end;
 end;
 
-procedure TFormDebug.RefreshDebug;
-begin
-  RefreshDebugControls;
-end;
-
-procedure TFormDebug.RefreshDebugControls;
+procedure TFormDebug.RefreshAutomationControls;
 var
   I: Integer;
   LSignal: TSignal;
-  LCheckBox: TCheckBox;
+  LAutoCtrl: TAutomationControl;
 begin
+  if not FDMPLC.PLC.Connected then
+    Exit;
+
   if FDMPLC.SignalCollection.Count = 0 then
     Exit;
 
   for I := 0 to Pred(Self.ControlCount) do
   begin
-    if Self.Controls[I] is TCheckBox then
+    if Self.Controls[I] is TAutomationControl then
     begin
-      LCheckBox := TCheckBox(Self.Controls[I]);
+      LAutoCtrl := TAutomationControl(Self.Controls[I]);
 
       // Ottieni l'indice del segnale associato al checkbox dal Tag
-      if (LCheckBox.Tag >= 0) and (LCheckBox.Tag < FDMPLC.SignalCollection.Count) and
-         (Pos('DEBUGCONTROL_', LCheckBox.Name) > 0) then
+      if (LAutoCtrl.SignalID >= 0) and (LAutoCtrl.SignalId < FDMPLC.SignalCollection.Count) and
+         (Pos('AUTOMATIONCONTROL_', LAutoCtrl.Name) > 0) then
       begin
         // Segnale dalla collezione
-        LSignal := FDMPLC.SignalCollection[LCheckBox.Tag];
+        LSignal := FDMPLC.SignalCollection[LAutoCtrl.SignalID];
 
         // Aggiorna il valore del checkbox in base al valore del segnale
-        LCheckBox.Checked := LSignal.Value;
+        LAutoCtrl.SetState(LSignal.Value);
       end;
     end;
   end;
@@ -104,7 +103,7 @@ end;
 
 procedure TFormDebug.TimerDebugTimer(Sender: TObject);
 begin
-  RefreshDebug;
+  RefreshAutomationControls;
 end;
 
 end.

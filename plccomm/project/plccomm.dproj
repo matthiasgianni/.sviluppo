@@ -138,6 +138,10 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\..\lib\UInfoForm.pas">
+            <Form>InfoForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -164,7 +168,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="Win32\Debug\plccomm.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\exe\plccomm.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>plccomm.exe</RemoteName>
                         <Overwrite>true</Overwrite>
