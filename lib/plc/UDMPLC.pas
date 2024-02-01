@@ -17,12 +17,11 @@ type
     Config: TConfigSettings;
 
     procedure LoadSignalsJSON(var Signals: TSignalCollection);
+    procedure ReadBytes;
   public
     { Public declarations }
     PLC: TPLC;
     SignalCollection: TSignalCollection;
-
-    procedure ReadBytes;
   end;
 
 var
@@ -79,7 +78,7 @@ end;
 procedure TDMPLC.TimerTimer(Sender: TObject);
 begin
   if PLC.Connected then
-    DMPLC.ReadBytes;
+    ReadBytes;
 end;
 
 procedure TDMPLC.LoadSignalsJSON(var Signals: TSignalCollection);
