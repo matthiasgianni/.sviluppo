@@ -35,15 +35,14 @@ begin
   TimerDebug.Enabled := False;
   FDMPLC := TDMPLC.Create(nil);
 
-  if FDMPLC.PLC.Connected then
-  begin
-    TimerDebug.Enabled := True;
-    ShowCustomMessageForm(ltOk, 'Connessione al plc eseguita correttamente');
-  end else
+  if not FDMPLC.PLC.Connected then
   begin
     ShowCustomMessageForm(ltError, 'Impossibile stabilire una connessione con il plc ' + FDMPLC.PLC.PLCIp);
-    Exit;
+    Application.Terminate;
   end;
+
+  TimerDebug.Enabled := True;
+  ShowCustomMessageForm(ltOk, 'Connessione al plc eseguita correttamente');
 
   GenerateAutomationControls;
   RefreshAutomationControls;

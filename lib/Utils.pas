@@ -241,9 +241,18 @@ begin
   LForm := TInfoForm.Create(Application);
   try
     case AType of
-      ltOk: LIconID := 0;
-      ltWarning: LIconID := 1;
-      ltError: LIconID := 2;
+      ltOk: begin
+        LIconID := 0;
+        LForm.Caption := 'Info';
+      end;
+      ltWarning: begin
+        LIconID := 1;
+        LForm.Caption := 'Warning';
+      end;
+      ltError: begin
+        LIconID := 2;
+        LForm.Caption := 'Error';
+      end;
     end;
 
     LForm.SetIcon(LIconID);
