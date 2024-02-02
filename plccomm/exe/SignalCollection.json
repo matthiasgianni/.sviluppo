@@ -1,7 +1,6 @@
 {
   "signals": [
-	{"DB": 40, "byte": 0, "bit": 0, "Name": "Ftc 1"},
-	{"DB": 40, "byte": 0, "bit": 1, "Name": "Ftc 2"},
-	{"DB": 40, "byte": 0, "bit": 2, "Name": "Ftc 3"}
+	{"DB": 5, "byte": 0, "bit": 4, "Name": "Presenza cassone"},
+	{"DB": 5, "byte": 0, "bit": 5, "Name": "Ciclo automatico"}
   ]
 }

@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.JSON, System.IOUtils,
-  System.Generics.Collections, UInfoForm;
+  System.Generics.Collections, UInfoFrame;
 
 type
   TSignalType = (stBool, stInt);
@@ -44,7 +44,7 @@ type
   function GetConfiguration(const ConfigName: string): TConfigSettings;
   function GetParameterValue(const Config: TConfigSettings; const ParamName: string): string;
 
-  procedure ShowCustomMessageForm(AType: TLogType; const AMessage: String);
+  procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
 
 var
   Configurations: array of TConfigSettings;
@@ -233,34 +233,43 @@ begin
   end;
 end;
 
-procedure ShowCustomMessageForm(AType: TLogType; const AMessage: String);
+procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
 var
-  LForm: TInfoForm;
+  I: Integer;
+  LFrame: TInfoFrame;
   LIconID: Integer;
 begin
-  LForm := TInfoForm.Create(Application);
-  try
-    case AType of
-      ltOk: begin
-        LIconID := 0;
-        LForm.Caption := 'Info';
-      end;
-      ltWarning: begin
-        LIconID := 1;
-        LForm.Caption := 'Warning';
-      end;
-      ltError: begin
-        LIconID := 2;
-        LForm.Caption := 'Error';
-      end;
-    end;
-
-    LForm.SetIcon(LIconID);
-    LForm.SetMessage(AMessage);
-    LForm.ShowModal;
-  finally
-    LForm.Free;
+  // Rimuovo eventuale frame creato in precedenza
+  for I := Pred(AParent.ControlCount) downto 0 do
+  begin
+    if AParent.Controls[I] is TInfoFrame then
+      TInfoFrame(AParent.Controls[I]).Free;
   end;
+
+  LFrame := TInfoFrame.Create(AParent);
+  LFrame.Parent := AParent;
+  LFrame.Align := alTop;
+  LFrame.AlignWithMargins := True;
+  LFrame.Margins.Left := 10;
+  LFrame.Margins.Top := 10;
+
+  case AType of
+    ltOk: begin
+      LIconID := 0;
+      LFrame.Color := $00C1FFC1;
+    end;
+    ltWarning: begin
+      LIconID := 1;
+      LFrame.Color := $00A6C2FF;
+    end;
+    ltError: begin
+      LIconID := 2;
+      LFrame.Color := $00EEDDFF;
+    end;
+  end;
+
+  LFrame.SetIcon(LIconID);
+  LFrame.SetMessage(AMessage);
 end;
 
 end.

@@ -3,7 +3,7 @@
     {
       "ConfigName": "PLC",
       "Parameters": [
-        {"Name": "Ip", "Value": "192.168.0.1"},
+        {"Name": "Ip", "Value": "10.207.4.30"},
         {"Name": "Rack", "Value": "0"},
         {"Name": "Slot", "Value": "1"}
       ]

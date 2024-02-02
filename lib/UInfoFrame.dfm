@@ -1,37 +1,50 @@
-object InfoForm: TInfoForm
+object InfoFrame: TInfoFrame
   Left = 0
   Top = 0
-  BorderStyle = bsDialog
-  Caption = 'InfoForm'
-  ClientHeight = 71
-  ClientWidth = 334
+  Width = 376
+  Height = 44
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -12
-  Font.Name = 'Segoe UI'
-  Font.Style = []
-  Position = poScreenCenter
-  TextHeight = 15
-  object LabelMessage: TLabel
-    Left = 64
-    Top = 24
-    Width = 74
-    Height = 15
-    Caption = 'LabelMessage'
-  end
+  ParentBackground = False
+  ParentColor = False
+  TabOrder = 0
   object Img: TImage
-    Left = 16
-    Top = 18
+    Left = 288
+    Top = 5
     Width = 32
     Height = 32
     Transparent = True
+    Visible = False
+  end
+  object Border: TShape
+    Left = 0
+    Top = 0
+    Width = 376
+    Height = 44
+    Align = alClient
+    Brush.Style = bsClear
+    Enabled = False
+    ExplicitLeft = -24
+  end
+  object LabelMessage: TLabel
+    Left = 12
+    Top = 15
+    Width = 77
+    Height = 15
+    Cursor = crHandPoint
+    Caption = 'LabelMessage'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    OnClick = LabelMessageClick
   end
   object ImageList: TImageList
     Height = 32
     Width = 32
-    Left = 272
-    Top = 16
+    Left = 212
+    Top = 6
     Bitmap = {
       494C010103000C00040020002000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000002000000001002000000000000040
