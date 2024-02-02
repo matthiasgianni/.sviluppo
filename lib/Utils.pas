@@ -58,23 +58,14 @@ begin
   // Stato predefinito
   FState := False;
 
-  // Dimensioni
-  Self.Width := 100;
-  Self.Height := 25;
-
-  // Posizionamento
-  AlignWithMargins := True;
-  Margins.Left := 10;
-  Margins.Top := 10;
-
   // Stili
   ParentBackground := False;
   BevelOuter := bvNone;
   BevelInner := bvNone;
   BevelKind := bkNone;
   Font.Name := 'Open Sans';
-  Font.Size := 10;
-  Font.Style := [fsBold];
+  Font.Size := 6;
+  //Font.Style := [fsBold];
 end;
 
 procedure TAutomationControl.SetState(const Value: Boolean);
@@ -96,8 +87,6 @@ begin
     Font.Color := clWhite;
     Color := $003F3FE4;
   end;
-
-  Caption := UpperCase(Caption);
 end;
 
 procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
@@ -118,7 +107,6 @@ begin
     LColor := clWebRed;
 
   TPanel(ASurface).ParentColor := False;
-  //TPanel(ASurface).ParentBackgrou
 
   TPanel(ASurface).Font.Color := clWhite;
   TPanel(ASurface).Font.Name := 'Open Sans';
@@ -248,7 +236,7 @@ begin
 
   LFrame := TInfoFrame.Create(AParent);
   LFrame.Parent := AParent;
-  LFrame.Align := alTop;
+  LFrame.Align := alBottom;
   LFrame.AlignWithMargins := True;
   LFrame.Margins.Left := 10;
   LFrame.Margins.Top := 10;

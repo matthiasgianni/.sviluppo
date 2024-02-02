@@ -3,8 +3,9 @@ unit UDebug;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Plc, Utils, UDMPLC;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, System.Math, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Plc, Utils, UDmPlc,
+  Vcl.WinXCtrls;
 
 type
   TFormDebug = class(TForm)
@@ -17,7 +18,7 @@ type
     FDMPLC: TDMPLC;
     Config: TConfigSettings;
 
-    procedure GenerateAutomationControls;
+    procedure GenerateAutomationControls(APlcConnected: Boolean);
     procedure RefreshAutomationControls;
   public
     { Public declarations }
@@ -34,35 +35,58 @@ procedure TFormDebug.FormCreate(Sender: TObject);
 begin
   TimerDebug.Enabled := False;
   FDMPLC := TDMPLC.Create(nil);
-
-  if not FDMPLC.PLC.Connected then
-    ShowCustomMessageForm(Self, ltError, 'Impossibile stabilire una connessione con il plc ' + FDMPLC.PLC.PLCIp)
-  else
-  begin
-    ShowCustomMessageForm(Self, ltOk, 'Connessione al plc eseguita correttamente');
-
-    TimerDebug.Enabled := True;
-    GenerateAutomationControls;
-  end;
+  GenerateAutomationControls(FDMPLC.PLC.Connected);
 end;
 
-procedure TFormDebug.GenerateAutomationControls;
+procedure TFormDebug.GenerateAutomationControls(APlcConnected: Boolean);
+const
+  NumColumns = 3; // Imposta il numero desiderato di colonne
+  ControlWidth = 60; // Larghezza del pannello
+  ControlHeight = 20; // Altezza del pannello
+  Margin = 10; // Margine tra i controlli
 var
+  I, Row, Column: Integer;
+  Panel: TAutomationControl;
+  LabelDesc: TLabel;
   LSignal: TSignal;
 begin
-  if not FDMPLC.PLC.Connected then
-    Exit;
-
+  I := 1;
   for LSignal in FDMPLC.SignalCollection do
   begin
-    with TAutomationControl.Create(Self) do
+    // Calcola la posizione della riga e della colonna
+    Row := (I - 1) div NumColumns;
+    Column := (I - 1) mod NumColumns;
+
+    // Crea il pannello
+    Panel := TAutomationControl.Create(Self);
+    Panel.Parent := Self;
+    Panel.Left := Column * (ControlWidth + Margin) + Margin;
+    Panel.Top := Row * (ControlHeight + Margin) + Margin;
+    Panel.Width := ControlWidth;
+    Panel.Height := ControlHeight;
+    
+    Panel.SignalID := LSignal.SignalIndex;
+    Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
+
+    Panel.Caption := '';
+    if not APlcConnected then
     begin
-      Parent := Self;
-      Align := alTop;
-      Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
-      Caption := LSignal.Name;
-      SignalID := LSignal.SignalIndex;
+      Panel.Color := clGray;
+      Panel.Caption := 'xxx';
+    end else
+    begin
+      // Crea la label
+      LabelDesc := TLabel.Create(Self);
+      LabelDesc.Parent := Panel;
+      LabelDesc.Caption := LSignal.Name;
+      LabelDesc.Font.Name := 'Open Sans';
+      LabelDesc.Left := 5;
+      LabelDesc.Top := 5;
+
+      TimerDebug.Enabled := True;
     end;
+
+    Inc(I);
   end;
 end;
 

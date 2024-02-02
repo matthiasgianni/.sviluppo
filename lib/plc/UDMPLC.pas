@@ -1,4 +1,4 @@
-unit UDMPLC;
+unit UDmPlc;
 
 interface
 
@@ -48,10 +48,10 @@ begin
   Slot := StrToInt(GetParameterValue(Config, 'Slot'));
 
   PLC := TPLC.Create(IP, Rack, Slot);
+  SignalCollection := TSignalCollection.Create;
+  LoadSignalsJSON(SignalCollection);
   if PLC.Connect then
   begin
-    SignalCollection := TSignalCollection.Create;
-    LoadSignalsJSON(SignalCollection);
     if SignalCollection.Count > 0 then
       Timer.Enabled := True;
   end;

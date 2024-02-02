@@ -133,14 +133,12 @@
         </DCCReference>
         <DCCReference Include="..\..\lib\Utils.pas"/>
         <DCCReference Include="..\..\lib\plc\Plc.pas"/>
-        <DCCReference Include="..\..\lib\plc\UDMPLC.pas">
+        <DCCReference Include="..\..\lib\plc\UDmPlc.pas">
             <Form>DMPLC</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="..\..\lib\UInfoFrame.pas">
             <Form>InfoFrame</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">

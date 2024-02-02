@@ -1,6 +1,8 @@
 {
   "signals": [
+    {"DB": 5, "byte": 0, "bit": 0, "Name": "Watchdog"}, 
 	{"DB": 5, "byte": 0, "bit": 4, "Name": "Presenza cassone"},
-	{"DB": 5, "byte": 0, "bit": 5, "Name": "Ciclo automatico"}
+	{"DB": 5, "byte": 0, "bit": 5, "Name": "Ciclo automatico"},
+	{"DB": 5, "byte": 0, "bit": 6, "Name": "Trasporto uscita in movimento"}
   ]
 }
