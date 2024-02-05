@@ -14,7 +14,7 @@ type
     ByteIndex: Integer;
     BitIndex: Integer;
     SignalLength: Integer;
-    Value: Word;
+    Value: Variant;
     Name: String;
   end;
 
