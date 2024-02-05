@@ -71,7 +71,6 @@ begin
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
 
-
     // Crea la label
     LabelDesc := TLabel.Create(Self);
     LabelDesc.Parent := Self;

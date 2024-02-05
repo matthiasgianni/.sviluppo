@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   System.Math, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.WinXCtrls;
+  Vcl.WinXCtrls, Plc;
 
 type
   TAutomationControl = class(TPanel)
@@ -13,9 +13,6 @@ type
     FText: String;
     FValue: Variant;
     FSignalID: Integer;
-    FParent: TWinControl;
-
-    procedure CreateLabel;
   published
     procedure SetValue(AValue: Variant);
   public
@@ -39,7 +36,6 @@ var
   LBorder: TShape;
 begin
   inherited Create(AOwner);
-  FParent := TWinControl(AOwner);
 
   LBorder := TShape.Create(Self);
   LBorder.Parent := Self;
@@ -58,21 +54,6 @@ begin
   Self.Font.Color := clWhite;
 
   Self.ParentBackground := False;
-
-  CreateLabel;
-
-  Repaint;
-end;
-
-procedure TAutomationControl.CreateLabel;
-var
-  LLabel: TLabel;
-begin
-  LLabel := TLabel.Create(FParent);
-  LLabel.Parent := FParent;
-  LLabel.Top := Self.Top - Self.Height;
-  LLabel.Left := Self.Left;
-  LLabel.Caption := Text;
 end;
 
 procedure TAutomationControl.SetValue(AValue: Variant);
