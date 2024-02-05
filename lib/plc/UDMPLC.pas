@@ -21,6 +21,7 @@ type
   public
     { Public declarations }
     PLC: TPLC;
+    PLCConnected: Boolean;
     SignalCollection: TSignalCollection;
   end;
 
@@ -35,8 +36,10 @@ procedure TDMPLC.DataModuleCreate(Sender: TObject);
 var
   IP: String;
   Rack, Slot: Integer;
+  PLCEnabled: Boolean;
 begin
   Timer.Enabled := False;
+  PLCConnected := False;
   Timer.Interval := 500;
 
   LoadConfigurations;
@@ -47,13 +50,20 @@ begin
   Rack := StrToInt(GetParameterValue(Config, 'Rack'));
   Slot := StrToInt(GetParameterValue(Config, 'Slot'));
 
-  PLC := TPLC.Create(IP, Rack, Slot);
+  PLCEnabled := StrToBool(GetParameterValue(Config, 'PLC Enabled'));
+
   SignalCollection := TSignalCollection.Create;
   LoadSignalsJSON(SignalCollection);
-  if PLC.Connect then
+
+  if PLCEnabled then
   begin
-    if SignalCollection.Count > 0 then
-      Timer.Enabled := True;
+    PLC := TPLC.Create(IP, Rack, Slot);
+    if PLC.Connect then
+    begin
+      PLCConnected := True;
+      if SignalCollection.Count > 0 then
+        Timer.Enabled := True;
+    end;
   end;
 end;
 
@@ -77,7 +87,7 @@ end;
 
 procedure TDMPLC.TimerTimer(Sender: TObject);
 begin
-  if PLC.Connected then
+  if PLCConnected then
     ReadBytes;
 end;
 

@@ -22,13 +22,10 @@ object FormDebug: TFormDebug
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 415
-    ExplicitWidth = 620
   end
   object TimerDebug: TTimer
-    Enabled = False
     OnTimer = TimerDebugTimer
     Left = 568
-    Top = 24
+    Top = 16
   end
 end

@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, System.JSON, System.IOUtils,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.WinXCtrls, System.JSON, System.IOUtils,
   System.Generics.Collections, UInfoFrame;
 
 type
@@ -21,21 +21,6 @@ type
     Parameters: TArray<TParameter>;
   end;
 
-  TAutomationControl = class(TPanel)
-  private
-    FSignalType: TSignalType;
-    FSignalID: Integer;
-    FState: Boolean;
-  protected
-    procedure Paint; override;
-  public
-    procedure SetState(const Value: Boolean);
-    constructor Create(AOwner: TComponent); override;
-  published
-    property SignalID: Integer read FSignalID write FSignalID;
-    property State: Boolean read FState write SetState default False;
-  end;
-
   procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
   function IntToBool(const AValue: Integer): Boolean;
 
@@ -50,44 +35,6 @@ var
   Configurations: array of TConfigSettings;
 
 implementation
-
-constructor TAutomationControl.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-
-  // Stato predefinito
-  FState := False;
-
-  // Stili
-  ParentBackground := False;
-  BevelOuter := bvNone;
-  BevelInner := bvNone;
-  BevelKind := bkNone;
-  Font.Name := 'Open Sans';
-  Font.Size := 6;
-  //Font.Style := [fsBold];
-end;
-
-procedure TAutomationControl.SetState(const Value: Boolean);
-begin
-  if FState <> Value then
-  begin
-    FState := Value;
-    Repaint;
-  end;
-end;
-
-procedure TAutomationControl.Paint;
-begin
-  inherited Paint;
-  if FState then
-    Color := $005CB85C
-  else
-  begin
-    Font.Color := clWhite;
-    Color := $003F3FE4;
-  end;
-end;
 
 procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
 var
