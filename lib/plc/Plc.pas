@@ -109,11 +109,9 @@ var
   i: Integer;
   signal: TSignal;
   readResult: Integer;
-  buffer: array of Byte; // Buffer generico per contenere dati da PLC
+  buffer: TArray<Byte>; // Buffer generico per contenere dati da PLC
 begin
   AError := '';
-
-  SetLength(buffer, 20); // Dimensiona il buffer per la lettura di 2 byte
 
   // Cicla attraverso ogni segnale
   for i := 0 to Signals.Count - 1 do
@@ -122,9 +120,11 @@ begin
 
     // Effettua la lettura dal PLC
     if signal.SignalLength = 1 then
-      readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, 1, @buffer[0])
+      SetLength(buffer, 1) // Se è un bit, setta la lunghezza del buffer a 1
     else
-      readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, signal.SignalLength, @buffer[0]);
+      SetLength(buffer, signal.SignalLength); // Altrimenti, setta la lunghezza del buffer in base alla lunghezza del segnale
+
+    readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, Length(buffer), @buffer[0]);
 
     // Verifica il risultato della lettura
     if readResult = 0 then
