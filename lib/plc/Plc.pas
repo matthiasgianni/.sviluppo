@@ -13,7 +13,8 @@ type
     DataBlock: Integer;
     ByteIndex: Integer;
     BitIndex: Integer;
-    Value: Boolean;
+    SignalLength: Integer;
+    Value: Word;
     Name: String;
   end;
 
@@ -108,22 +109,33 @@ var
   i: Integer;
   signal: TSignal;
   readResult: Integer;
-  buffer: Byte; // Buffer separato per ogni segnale
+  buffer: array of Byte; // Buffer generico per contenere dati da PLC
 begin
   AError := '';
+
+  SetLength(buffer, 20); // Dimensiona il buffer per la lettura di 2 byte
+
   // Cicla attraverso ogni segnale
   for i := 0 to Signals.Count - 1 do
   begin
     signal := Signals[i];
 
     // Effettua la lettura dal PLC
-    readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, 1, @buffer);
+    if signal.SignalLength = 1 then
+      readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, 1, @buffer[0])
+    else
+      readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, signal.SignalLength, @buffer[0]);
 
     // Verifica il risultato della lettura
     if readResult = 0 then
     begin
-      // Aggiorna il valore del segnale nella lista
-      signal.Value := (buffer and (1 shl signal.BitIndex)) <> 0;
+      if signal.SignalLength = 1 then
+        // Aggiorna il valore del singolo bit nella lista
+        signal.Value := Ord((buffer[0] and (1 shl signal.BitIndex)) <> 0)
+      else
+        // Aggiorna il valore del dato a più byte nella lista
+        signal.Value := Swap(PWord(@buffer[0])^);
+
       Signals[i] := signal;
     end else
     begin

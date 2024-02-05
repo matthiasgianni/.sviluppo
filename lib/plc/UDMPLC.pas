@@ -125,7 +125,8 @@ begin
           Signal.DataBlock := SignalObject.GetValue('DB').Value.ToInteger;
           Signal.ByteIndex := SignalObject.GetValue('byte').Value.ToInteger;
           Signal.BitIndex := SignalObject.GetValue('bit').Value.ToInteger;
-          Signal.Value := False; // default false before reading
+          Signal.Value := 0;
+          Signal.SignalLength := SignalObject.GetValue('dim').Value.ToInteger;
           Signal.Name := SignalObject.GetValue('Name').Value;
           Signal.SignalIndex := i;
 

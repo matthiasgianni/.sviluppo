@@ -58,12 +58,17 @@ end;
 
 procedure TAutomationControl.SetValue(AValue: Variant);
 begin
-  Caption := Text;
+  Caption := AValue;
 
   if AValue then
-    Color := clLime
-  else
+  begin
+    Color := clLime;
+    Self.Font.Color := clBlack;
+  end else
+  begin
     Color := clRed;
+    Self.Font.Color := clWhite;
+  end;
 end;
 
 end.
