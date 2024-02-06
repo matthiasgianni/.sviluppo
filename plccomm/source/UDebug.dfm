@@ -23,6 +23,31 @@ object FormDebug: TFormDebug
     ParentBackground = False
     TabOrder = 0
   end
+  object PageAutomationControls: TPageControl
+    Left = 0
+    Top = 0
+    Width = 289
+    Height = 416
+    ActivePage = ts1
+    Align = alLeft
+    TabOrder = 1
+    object ts1: TTabSheet
+      Caption = 'ts1'
+      object PanelAutomationControls: TPanel
+        Left = 0
+        Top = 0
+        Width = 281
+        Height = 386
+        Align = alClient
+        BevelOuter = bvNone
+        Color = clWhite
+        ParentBackground = False
+        TabOrder = 0
+        ExplicitLeft = -16
+        ExplicitWidth = 297
+      end
+    end
+  end
   object TimerDebug: TTimer
     Interval = 500
     OnTimer = TimerDebugTimer
