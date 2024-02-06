@@ -17,6 +17,9 @@ type
     { Private declarations }
     FDMPLC: TDMPLC;
     Config: TConfigSettings;
+    FColNum: Integer;
+    FHorizontalMargin: Integer;
+    FVerticalMargin: Integer;
 
     procedure GenerateAutomationControls;
     procedure RefreshAutomationControls;
@@ -33,7 +36,11 @@ implementation
 
 procedure TFormDebug.FormCreate(Sender: TObject);
 begin
-  //TimerDebug.Enabled := True;
+  Config := GetConfiguration('Debug');
+  FColNum := StrToInt(GetParameterValue(Config, 'Columns', '3'));
+  FHorizontalMargin := StrToInt(GetParameterValue(Config, 'HorizontalMargin', '40'));
+  FVerticalMargin := StrToInt(GetParameterValue(Config, 'VerticalMargin', '20'));
+
   FDMPLC := TDMPLC.Create(nil);
   GenerateAutomationControls;
 end;
@@ -42,28 +49,23 @@ procedure TFormDebug.GenerateAutomationControls;
 const
   ControlWidth = 40; // Larghezza del pannello
   ControlHeight = 15; // Altezza del pannello
-  HorizontalMargin = 60; // Margine orizzontale tra i controlli
-  VerticalMargin = 20; // Margine verticale tra i controlli
 var
   I, Row, Column: Integer;
   Panel: TAutomationControl;
   LabelDesc: TLabel;
   LSignal: TSignal;
-  NumColumns: Integer; // Numero di colonne desiderato
 begin
-  NumColumns := 3; // Imposta il numero desiderato di colonne
-
   I := 0;
   for LSignal in FDMPLC.SignalCollection do
   begin
-    Row := I div NumColumns;
-    Column := I mod NumColumns;
+    Row := I div FColNum;
+    Column := I mod FColNum;
 
     // Crea il pannello
     Panel := TAutomationControl.Create(Self);
     Panel.Parent := Self;
-    Panel.Left := HorizontalMargin + Column * (ControlWidth + HorizontalMargin);
-    Panel.Top := VerticalMargin + Row * (ControlHeight + VerticalMargin);
+    Panel.Left := FHorizontalMargin + Column * (ControlWidth + FHorizontalMargin);
+    Panel.Top := FVerticalMargin + Row * (ControlHeight + FVerticalMargin);
     Panel.Width := ControlWidth;
     Panel.Height := ControlHeight;
 
@@ -74,14 +76,13 @@ begin
     // Crea la label
     LabelDesc := TLabel.Create(Self);
     LabelDesc.Parent := Self;
-    LabelDesc.Top := VerticalMargin + Row * (ControlHeight + VerticalMargin) - LabelDesc.Height;
+    LabelDesc.Top := FVerticalMargin + Row * (ControlHeight + FVerticalMargin) - LabelDesc.Height;
     LabelDesc.Left := Panel.Left;
     LabelDesc.Caption := LSignal.Name;
 
     Inc(I);
   end;
 end;
-
 
 procedure TFormDebug.RefreshAutomationControls;
 var
@@ -104,7 +105,6 @@ begin
       begin
         // Segnale dalla collezione
         LSignal := FDMPLC.SignalCollection[LAutoCtrl.SignalID];
-        //LAutoCtrl.IsPlcConnected := FDMPLC.PLCConnected;
         LAutoCtrl.SetValue(LSignal.Value);
       end;
     end;

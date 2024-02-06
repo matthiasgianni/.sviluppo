@@ -10,9 +10,12 @@
       ]
     },
     {
-      "ConfigName": "Info",
+      "ConfigName": "Debug",
       "Parameters": [
-        {"Name": "SWName", "Value": "12"}
+        {"Name": "Show", "Value": "True"},
+		{"Name": "Columns", "Value": "2"},
+		{"Name": "HorizontalMargin", "Value": "40"},
+		{"Name": "VerticalMargin", "Value": "20"}
       ]
     }
   ]

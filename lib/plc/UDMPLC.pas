@@ -42,8 +42,6 @@ begin
   PLCConnected := False;
   Timer.Interval := 500;
 
-  LoadConfigurations;
-
   // Leggo la configurazione del PLC
   Config := GetConfiguration('PLC');
   IP := GetParameterValue(Config, 'Ip');

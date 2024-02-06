@@ -27,7 +27,8 @@ type
   // JSON METHODS
   procedure LoadConfigurations;
   function GetConfiguration(const ConfigName: string): TConfigSettings;
-  function GetParameterValue(const Config: TConfigSettings; const ParamName: string): string;
+  function GetParameterValue(const Config: TConfigSettings; const ParamName: string;
+    const DefaultValue: string = ''): string;
 
   procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
 
@@ -152,11 +153,11 @@ begin
   FillChar(Result, SizeOf(Result), 0);
 end;
 
-function GetParameterValue(const Config: TConfigSettings; const ParamName: string): string;
+function GetParameterValue(const Config: TConfigSettings; const ParamName: string; const DefaultValue: string = ''): string;
 var
   Param: TParameter;
 begin
-  Result := '';
+  Result := DefaultValue; // Imposta il valore di default
 
   for Param in Config.Parameters do
   begin

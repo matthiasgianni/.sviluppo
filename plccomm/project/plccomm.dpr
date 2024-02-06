@@ -13,7 +13,12 @@ uses
 
 begin
   Application.Initialize;
+
+  // Load configurations from JSON
+  LoadConfigurations;
+
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFormDebug, FormDebug);
+
   Application.Run;
 end.
