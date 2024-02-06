@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, System.Math, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Plc, Utils, UDmPlc,
-  CustomControls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, Vcl.Clipbrd,
+  Plc, Utils, UDmPlc, CustomControls;
 
 type
   TFormDebug = class(TForm)
@@ -23,6 +23,7 @@ type
 
     procedure GenerateAutomationControls;
     procedure RefreshAutomationControls;
+    procedure AutomationControlClick(Sender: TObject);
   public
     { Public declarations }
   end;
@@ -47,7 +48,7 @@ end;
 
 procedure TFormDebug.GenerateAutomationControls;
 const
-  ControlWidth = 40; // Larghezza del pannello
+  ControlWidth = 40;  // Larghezza del pannello
   ControlHeight = 15; // Altezza del pannello
 var
   I, Row, Column: Integer;
@@ -72,6 +73,8 @@ begin
     Panel.SignalID := LSignal.SignalIndex;
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
+    Panel.Cursor := crHandPoint;
+    Panel.OnClick := AutomationControlClick;
 
     // Crea la label
     LabelDesc := TLabel.Create(Self);
@@ -106,7 +109,27 @@ begin
         // Segnale dalla collezione
         LSignal := FDMPLC.SignalCollection[LAutoCtrl.SignalID];
         LAutoCtrl.SetValue(LSignal.Value);
+        // Se è un bit allora evito di scriverci dentro
+        if LSignal.SignalLength = 1 then
+          LAutoCtrl.Caption := '';
       end;
+    end;
+  end;
+end;
+
+procedure TFormDebug.AutomationControlClick(Sender: TObject);
+begin
+  if Sender is TAutomationControl then
+  begin
+    try
+      if TAutomationControl(Sender).Caption = '' then
+        Exit;
+      Clipboard.Clear;
+      Clipboard.AsText := TAutomationControl(Sender).Caption;
+      LogStatus(pnlStatus, Format('Testo copiato (%s)', [Clipboard.AsText]), ltOk);
+    except
+      on E: Exception do
+        LogStatus(pnlStatus, Format('Errore durante la copia nella clipboard: %s', [E.Message]), ltError);
     end;
   end;
 end;

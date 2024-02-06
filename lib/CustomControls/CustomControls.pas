@@ -41,6 +41,7 @@ begin
   LBorder.Parent := Self;
   LBorder.Align := alClient;
   LBorder.Brush.Style := bsClear;
+  LBorder.Enabled := False;
 
   Self.BevelInner := bvNone;
   Self.BevelKind := bkNone;
