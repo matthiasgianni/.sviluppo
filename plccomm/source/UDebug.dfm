@@ -22,6 +22,7 @@ object FormDebug: TFormDebug
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 418
   end
   object PageAutomationControls: TPageControl
     Left = 0
@@ -43,8 +44,6 @@ object FormDebug: TFormDebug
         Color = clWhite
         ParentBackground = False
         TabOrder = 0
-        ExplicitLeft = -16
-        ExplicitWidth = 297
       end
     end
   end

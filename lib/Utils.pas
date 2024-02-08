@@ -32,6 +32,8 @@ type
 
   procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
 
+  function HexUTF16ToUnicodeString(const HexString: string): string;
+
 var
   Configurations: array of TConfigSettings;
 
@@ -206,6 +208,11 @@ begin
 
   LFrame.SetIcon(LIconID);
   LFrame.SetMessage(AMessage);
+end;
+
+function HexUTF16ToUnicodeString(const HexString: string): string;
+begin
+  // TODO: To implement
 end;
 
 end.

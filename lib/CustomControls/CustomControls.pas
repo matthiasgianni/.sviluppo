@@ -13,12 +13,16 @@ type
     FText: String;
     FValue: Variant;
     FSignalID: Integer;
+    FSignalLength: Integer;
+    FError: Boolean;
   published
     procedure SetValue(AValue: Variant);
   public
     property Text: String read FText write FText;
     property Value: Variant read FValue write SetValue;
     property SignalID: Integer read FSignalID write FSignalID;
+    property SignalLength: Integer read FSignalLength write FSignalLength;
+    property Error: Boolean read FError write FError;
 
     constructor Create(AOwner: TComponent); override;
   end;
@@ -61,15 +65,32 @@ procedure TAutomationControl.SetValue(AValue: Variant);
 begin
   Caption := AValue;
 
-  if AValue then
+  if Error then
   begin
-    Color := clLime;
-    Self.Font.Color := clBlack;
+    Color := clGray;
+    Caption := 'error';
+    Exit;
+  end;
+
+  // Bit
+  if SignalLength = 1 then
+  begin
+    Caption := '';
+    if AValue then
+    begin
+      Color := $5BF886;
+      Self.Font.Color := clBlack;
+    end else
+    begin
+      Color := $665BF8;
+      Self.Font.Color := clWhite;
+    end;
   end else
   begin
-    Color := clRed;
-    Self.Font.Color := clWhite;
+    Self.Font.Color := clBlack;
+    Color := cLWhite;
   end;
+
 end;
 
 end.

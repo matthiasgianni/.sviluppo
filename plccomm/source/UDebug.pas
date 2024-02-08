@@ -86,6 +86,7 @@ begin
     Panel.Height := FControlHeight;
 
     Panel.SignalID := LSignal.SignalIndex;
+    Panel.SignalLength := LSignal.SignalLength;
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
     Panel.Cursor := crHandPoint;
@@ -123,13 +124,19 @@ begin
       begin
         // Segnale dalla collezione
         LSignal := FDMPLC.SignalCollection[LAutoCtrl.SignalID];
+
+        // Gestione errore
+        LAutoCtrl.Error := FDMPLC.Error;
+        if FDMPLC.Error then
+          LogStatus(pnlStatus, FDMPLC.ErrorMessage, ltError);
+
+        // Set del valore
         LAutoCtrl.SetValue(LSignal.Value);
-        // Se è un bit allora evito di scriverci dentro
-        if LSignal.SignalLength = 1 then
-          LAutoCtrl.Caption := '';
       end;
     end;
   end;
+
+  TimerDebug.Enabled := not FDMPLC.Error;
 end;
 
 procedure TFormDebug.AutomationControlClick(Sender: TObject);
@@ -144,14 +151,15 @@ begin
       LogStatus(pnlStatus, Format('Testo copiato (%s)', [Clipboard.AsText]), ltOk);
     except
       on E: Exception do
-        LogStatus(pnlStatus, Format('Errore durante la copia nella clipboard: %s', [E.Message]), ltError);
+        LogStatus(pnlStatus, E.Message, ltError);
     end;
   end;
 end;
 
 procedure TFormDebug.TimerDebugTimer(Sender: TObject);
 begin
-  RefreshAutomationControls(PanelAutomationControls);
+  if FDMPLC.PLCConnected then
+    RefreshAutomationControls(PanelAutomationControls);
 end;
 
 end.

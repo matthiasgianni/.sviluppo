@@ -15,6 +15,8 @@ type
   private
     { Private declarations }
     Config: TConfigSettings;
+    FError: Boolean;
+    FErrorMessage: string;
 
     procedure LoadSignalsJSON(var Signals: TSignalCollection);
     procedure ReadBytes;
@@ -23,6 +25,9 @@ type
     PLC: TPLC;
     PLCConnected: Boolean;
     SignalCollection: TSignalCollection;
+
+    property Error: Boolean read FError write FError;
+    property ErrorMessage: string read FErrorMessage write FErrorMessage;
   end;
 
 var
@@ -38,6 +43,8 @@ var
   Rack, Slot: Integer;
   PLCEnabled: Boolean;
 begin
+  FError := False;
+  FErrorMessage := '';
   Timer.Enabled := False;
   PLCConnected := False;
   Timer.Interval := 500;
@@ -62,11 +69,14 @@ begin
       if SignalCollection.Count > 0 then
         Timer.Enabled := True;
     end;
+    // TODO: aggiungere errore se tentativo di connessione al plc fallisce
   end;
 end;
 
 procedure TDMPLC.DataModuleDestroy(Sender: TObject);
 begin
+  FError := False;
+  FErrorMessage := '';
   PLC.Disconnect;
   Timer.Enabled := False;
 end;
@@ -79,8 +89,10 @@ begin
   if LError <> '' then
   begin
     Timer.Enabled := False;
+    FError := True;
+    FErrorMessage := LError;
     PLC.Disconnect;
-    MessageDlg(LError, mtError, mbOKCancel, 0);
+    //MessageDlg(LError, mtError, mbOKCancel, 0);
   end;
 end;
 
