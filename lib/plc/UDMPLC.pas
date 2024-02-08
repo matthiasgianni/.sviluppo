@@ -78,6 +78,7 @@ begin
   PLC.ReadSignalsFromPLC(SignalCollection, LError);
   if LError <> '' then
   begin
+    Timer.Enabled := False;
     PLC.Disconnect;
     MessageDlg(LError, mtError, mbOKCancel, 0);
   end;
