@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   System.Math, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.WinXCtrls, Plc;
+  Vcl.WinXCtrls, Vcl.Clipbrd, Plc;
 
 type
   TAutomationControl = class(TPanel)
@@ -15,6 +15,8 @@ type
     FSignalID: Integer;
     FSignalLength: Integer;
     FError: Boolean;
+
+    procedure ControlClick(Sender: TObject);
   published
     procedure SetValue(AValue: Variant);
   public
@@ -59,6 +61,8 @@ begin
   Self.Font.Color := clWhite;
 
   Self.ParentBackground := False;
+
+  Self.OnClick := ControlClick;
 end;
 
 procedure TAutomationControl.SetValue(AValue: Variant);
@@ -90,7 +94,22 @@ begin
     Self.Font.Color := clBlack;
     Color := cLWhite;
   end;
+end;
 
+procedure TAutomationControl.ControlClick(Sender: TObject);
+begin
+  if Sender is TAutomationControl then
+  begin
+    try
+      if TAutomationControl(Sender).Caption = '' then
+        Exit;
+      Clipboard.Clear;
+      Clipboard.AsText := TAutomationControl(Sender).Caption;
+    except
+      on E: Exception do
+        MessageDlg(E.Message, mtError, [mbOk], 0);
+    end;
+  end;
 end;
 
 end.

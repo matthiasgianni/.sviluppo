@@ -1,7 +1,5 @@
 {
   "signals": [
-  	{"DB": 40, "byte": 0, "bit": 0, "dim": 2, "Name": "Encoder"},
-	{"DB": 40, "byte": 2, "bit": 0, "dim": 1, "Name": "Test"},
-	{"DB": 40, "byte": 2, "bit": 1, "dim": 1, "Name": "Test 1"}
+  	{"DB": 40, "byte": 0, "bit": 0, "dim": 2, "Name": "Encoder"}
   ]
 }

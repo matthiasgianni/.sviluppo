@@ -142,6 +142,11 @@
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
         <DCCReference Include="..\..\lib\CustomControls\CustomControls.pas"/>
+        <DCCReference Include="..\..\lib\UFrameDebug.pas">
+            <Form>FrameDebug</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

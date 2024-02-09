@@ -7,7 +7,8 @@ uses
   Plc in '..\..\lib\plc\Plc.pas',
   UDmPlc in '..\..\lib\plc\UDmPlc.pas' {DMPLC: TDataModule},
   UInfoFrame in '..\..\lib\UInfoFrame.pas' {InfoFrame: TFrame},
-  CustomControls in '..\..\lib\CustomControls\CustomControls.pas';
+  CustomControls in '..\..\lib\CustomControls\CustomControls.pas',
+  UFrameDebug in '..\..\lib\UFrameDebug.pas' {FrameDebug: TFrame};
 
 {$R *.res}
 
@@ -18,7 +19,7 @@ begin
   LoadConfigurations;
 
   Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TDMPLC, DMPLC);
   Application.CreateForm(TFormDebug, FormDebug);
-
   Application.Run;
 end.
