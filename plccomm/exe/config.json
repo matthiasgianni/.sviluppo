@@ -3,7 +3,7 @@
     {
       "ConfigName": "PLC",
       "Parameters": [
-        {"Name": "PLC Enabled", "Value": "True"},	  
+        {"Name": "PLC Enabled", "Value": "False"},	  
         {"Name": "Ip", "Value": "192.168.1.100"},
         {"Name": "Rack", "Value": "0"},
         {"Name": "Slot", "Value": "1"}
@@ -18,6 +18,13 @@
 		{"Name": "VerticalMargin", "Value": "30"},
 		{"Name": "ControlWidth", "Value": "50"},
 		{"Name": "ControlHeight", "Value": "20"}
+      ]
+    },
+	{
+      "ConfigName": "ComPort",
+      "Parameters": [
+        {"Name": "COM", "Value": "COM7"},
+		{"Name": "Terminator", "Value": "#13"}
       ]
     }
   ]

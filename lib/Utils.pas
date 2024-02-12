@@ -21,18 +21,15 @@ type
     Parameters: TArray<TParameter>;
   end;
 
+  // Custom message
+  procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
   procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
-  function IntToBool(const AValue: Integer): Boolean;
 
   // JSON METHODS
   procedure LoadConfigurations;
   function GetConfiguration(const ConfigName: string): TConfigSettings;
   function GetParameterValue(const Config: TConfigSettings; const ParamName: string;
     const DefaultValue: string = ''): string;
-
-  procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
-
-  function HexUTF16ToUnicodeString(const HexString: string): string;
 
 var
   Configurations: array of TConfigSettings;
@@ -208,11 +205,6 @@ begin
 
   LFrame.SetIcon(LIconID);
   LFrame.SetMessage(AMessage);
-end;
-
-function HexUTF16ToUnicodeString(const HexString: string): string;
-begin
-  // TODO: To implement
 end;
 
 end.

@@ -54,7 +54,6 @@ begin
   IP := GetParameterValue(Config, 'Ip');
   Rack := StrToInt(GetParameterValue(Config, 'Rack'));
   Slot := StrToInt(GetParameterValue(Config, 'Slot'));
-
   PLCEnabled := StrToBool(GetParameterValue(Config, 'PLC Enabled'));
 
   SignalCollection := TSignalCollection.Create;

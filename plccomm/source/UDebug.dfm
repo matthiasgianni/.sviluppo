@@ -13,7 +13,7 @@ object FormDebug: TFormDebug
   Position = poScreenCenter
   OnCreate = FormCreate
   TextHeight = 15
-  object pnlStatus: TPanel
+  object PanelStatus: TPanel
     Left = 0
     Top = 416
     Width = 624
@@ -22,6 +22,7 @@ object FormDebug: TFormDebug
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 418
+    ExplicitTop = 415
+    ExplicitWidth = 620
   end
 end

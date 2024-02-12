@@ -8,7 +8,9 @@ uses
   UDmPlc in '..\..\lib\plc\UDmPlc.pas' {DMPLC: TDataModule},
   UInfoFrame in '..\..\lib\UInfoFrame.pas' {InfoFrame: TFrame},
   CustomControls in '..\..\lib\CustomControls\CustomControls.pas',
-  UFrameDebug in '..\..\lib\UFrameDebug.pas' {FrameDebug: TFrame};
+  UFrameDebug in '..\..\lib\UFrameDebug.pas' {FrameDebug: TFrame},
+  UComPort in '..\..\lib\ComPort\UComPort.pas',
+  UDMStartup in '..\source\UDMStartup.pas' {DMStartup: TDataModule};
 
 {$R *.res}
 
@@ -19,6 +21,7 @@ begin
   LoadConfigurations;
 
   Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TDMStartup, DMStartup);
   Application.CreateForm(TDMPLC, DMPLC);
   Application.CreateForm(TFormDebug, FormDebug);
   Application.Run;
