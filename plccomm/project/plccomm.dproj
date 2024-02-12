@@ -130,23 +130,22 @@
             <Form>FormDebug</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\lib\Utils.pas"/>
-        <DCCReference Include="..\..\lib\plc\Plc.pas"/>
-        <DCCReference Include="..\..\lib\plc\UDmPlc.pas">
+        <DCCReference Include="..\..\common\Utils.pas"/>
+        <DCCReference Include="..\..\common\plc\Plc.pas"/>
+        <DCCReference Include="..\..\common\plc\UDmPlc.pas">
             <Form>DMPLC</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\lib\UInfoFrame.pas">
+        <DCCReference Include="..\..\common\UInfoFrame.pas">
             <Form>InfoFrame</Form>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\lib\CustomControls\CustomControls.pas"/>
-        <DCCReference Include="..\..\lib\UFrameDebug.pas">
+        <DCCReference Include="..\..\common\CustomControls\CustomControls.pas"/>
+        <DCCReference Include="..\..\common\UFrameDebug.pas">
             <Form>FrameDebug</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\lib\ComPort\UComPort.pas"/>
+        <DCCReference Include="..\..\common\ComPort\UComPort.pas"/>
         <DCCReference Include="..\source\UDMStartup.pas">
             <Form>DMStartup</Form>
             <FormType>dfm</FormType>

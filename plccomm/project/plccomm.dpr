@@ -3,13 +3,13 @@ program plccomm;
 uses
   Vcl.Forms,
   UDebug in '..\source\UDebug.pas' {FormDebug},
-  Utils in '..\..\lib\Utils.pas',
-  Plc in '..\..\lib\plc\Plc.pas',
-  UDmPlc in '..\..\lib\plc\UDmPlc.pas' {DMPLC: TDataModule},
-  UInfoFrame in '..\..\lib\UInfoFrame.pas' {InfoFrame: TFrame},
-  CustomControls in '..\..\lib\CustomControls\CustomControls.pas',
-  UFrameDebug in '..\..\lib\UFrameDebug.pas' {FrameDebug: TFrame},
-  UComPort in '..\..\lib\ComPort\UComPort.pas',
+  Utils in '..\..\common\Utils.pas',
+  Plc in '..\..\common\plc\Plc.pas',
+  UDmPlc in '..\..\common\plc\UDmPlc.pas' {DMPLC: TDataModule},
+  UInfoFrame in '..\..\common\UInfoFrame.pas' {InfoFrame: TFrame},
+  CustomControls in '..\..\common\CustomControls\CustomControls.pas',
+  UFrameDebug in '..\..\common\UFrameDebug.pas' {FrameDebug: TFrame},
+  UComPort in '..\..\common\ComPort\UComPort.pas',
   UDMStartup in '..\source\UDMStartup.pas' {DMStartup: TDataModule};
 
 {$R *.res}
