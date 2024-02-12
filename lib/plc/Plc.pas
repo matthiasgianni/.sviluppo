@@ -51,6 +51,7 @@ begin
   FPLCIp := AIp;
   FPLCRack := ARack;
   FPLCSlot := ASlot;
+  FConnected := False;
 end;
 
 function TPLC.Connect: Boolean;
@@ -75,21 +76,10 @@ begin
       FdC := daveNewConnection(FdI, 0, FPLCRack, FPLCSlot);
 
       if daveConnectPLC(FdC) = 0 then
-      begin
-        FConnected := True;
-      end else
-      begin
-        FConnected := False;
-        // Chiudi la connessione in caso di errore
+        FConnected := True
+      else
         daveDisconnectAdapter(FdI);
-      end;
-    end else
-    begin
-      FConnected := False;
     end;
-  end else
-  begin
-    FConnected := False;
   end;
   Result := FConnected;
 end;

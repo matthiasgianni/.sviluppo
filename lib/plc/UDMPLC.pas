@@ -60,9 +60,9 @@ begin
   SignalCollection := TSignalCollection.Create;
   LoadSignalsJSON(SignalCollection);
 
+  PLC := TPLC.Create(IP, Rack, Slot);
   if PLCEnabled then
   begin
-    PLC := TPLC.Create(IP, Rack, Slot);
     if PLC.Connect then
     begin
       PLCConnected := True;
