@@ -8,28 +8,20 @@ uses
 
 type
   TDMPLC = class(TDataModule)
-    Timer: TTimer;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
-    procedure TimerTimer(Sender: TObject);
   private
     { Private declarations }
     Config: TConfigSettings;
-    FError: Boolean;
-    FErrorMessage: string;
+    FSignalCollection: TSignalCollection;
 
     procedure LoadPLCConfiguration;
-    procedure InitializePLC;
     procedure LoadSignalsJSON(var Signals: TSignalCollection);
-    procedure ReadBytes;
   public
     { Public declarations }
     PLC: TPLC;
+    PLCThread: TPlcPollingThread;
     PLCConnected: Boolean;
-    SignalCollection: TSignalCollection;
-
-    property Error: Boolean read FError write FError;
-    property ErrorMessage: string read FErrorMessage write FErrorMessage;
   end;
 
 var
@@ -46,10 +38,7 @@ end;
 
 procedure TDMPLC.DataModuleDestroy(Sender: TObject);
 begin
-  FError := False;
-  FErrorMessage := '';
-  PLC.Disconnect;
-  Timer.Enabled := False;
+  PLC.Free;
 end;
 
 procedure TDMPLC.LoadPLCConfiguration;
@@ -58,12 +47,6 @@ var
   Rack, Slot: Integer;
   PLCEnabled: Boolean;
 begin
-  FError := False;
-  FErrorMessage := '';
-  Timer.Enabled := False;
-  PLCConnected := False;
-  Timer.Interval := 500;
-
   // Leggo la configurazione del PLC
   Config := GetConfiguration('PLC');
   IP := GetParameterValue(Config, 'Ip');
@@ -71,33 +54,16 @@ begin
   Slot := StrToInt(GetParameterValue(Config, 'Slot'));
   PLCEnabled := StrToBool(GetParameterValue(Config, 'PLC Enabled'));
 
-  SignalCollection := TSignalCollection.Create;
-  LoadSignalsJSON(SignalCollection);
+  FSignalCollection := TSignalCollection.Create;
+  LoadSignalsJSON(FSignalCollection);
 
-  PLC := TPLC.Create(IP, Rack, Slot);
   if PLCEnabled then
-    InitializePLC;
-end;
+  begin
+    PLC := TPLC.Create(IP, Rack, Slot);
+    PLC.SignalCollection := FSignalCollection;
+    PLCThread := TPlcPollingThread.Create(True, PLC, 1000);
 
-procedure TDMPLC.InitializePLC;
-begin
-  try
-    if PLC.Connect(FErrorMessage) then
-    begin
-      PLCConnected := True;
-      if SignalCollection.Count > 0 then
-        Timer.Enabled := True;
-    end
-    else
-      raise ECustomException.Create(FErrorMessage);
-  except
-    on E: ECustomException do
-    begin
-      E.LogError;
-      // Ensure cleanup in case of an exception
-      PLC.Disconnect;
-      Timer.Enabled := False;
-    end;
+    PLCThread.Start;
   end;
 end;
 
@@ -139,6 +105,7 @@ begin
           Signal.SignalLength := SignalObject.GetValue('dim').Value.ToInteger;
           Signal.Name := SignalObject.GetValue('Name').Value;
           Signal.SignalIndex := i;
+          Signal.InError := False;
 
           Signals.Add(Signal);
         end;
@@ -147,27 +114,6 @@ begin
   finally
     JSONObject.Free;
   end;
-end;
-
-procedure TDMPLC.ReadBytes;
-var
-  LError: String;
-begin
-  PLC.ReadSignalsFromPLC(SignalCollection, LError);
-  if LError <> '' then
-  begin
-    Timer.Enabled := False;
-    FError := True;
-    FErrorMessage := LError;
-    PLC.Disconnect;
-    //MessageDlg(LError, mtError, mbOKCancel, 0);
-  end;
-end;
-
-procedure TDMPLC.TimerTimer(Sender: TObject);
-begin
-  if PLCConnected then
-    ReadBytes;
 end;
 
 end.

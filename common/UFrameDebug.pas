@@ -51,7 +51,7 @@ begin
   FControlHeight := StrToInt(GetParameterValue(FConfig, 'ControlHeight', '20'));
 
   TimerUpdate.Enabled := False;
-  if (DMPLC.PLCConnected) and (DMPLC.SignalCollection.Count > 0) then
+  if (DMPLC.PLC <> nil) then
   begin
     GenerateControls;
     TimerUpdate.Enabled := True;
@@ -66,7 +66,7 @@ var
   LSignal: TSignal;
 begin
   I := 0;
-  for LSignal in DMPLC.SignalCollection do
+  for LSignal in DMPLC.PLC.SignalCollection do
   begin
     Row := I div FColNum;
     Column := I mod FColNum;
@@ -84,7 +84,6 @@ begin
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
     Panel.Cursor := crHandPoint;
-    //Panel.OnClick := ControlClick;
 
     // Crea la label
     LabelDesc := TLabel.Create(Self);
@@ -110,24 +109,18 @@ begin
       LAutoCtrl := TAutomationControl(Self.Controls[I]);
 
       // Ottieni l'indice del segnale associato al checkbox dal Tag
-      if (LAutoCtrl.SignalID >= 0) and (LAutoCtrl.SignalId < DMPLC.SignalCollection.Count) and
+      if (LAutoCtrl.SignalID >= 0) and (LAutoCtrl.SignalId < DMPLC.PLC.SignalCollection.Count) and
          (Pos('AUTOMATIONCONTROL_', LAutoCtrl.Name) > 0) then
       begin
         // Segnale dalla collezione
-        LSignal := DMPLC.SignalCollection[LAutoCtrl.SignalID];
+        LSignal := DMPLC.PLC.SignalCollection[LAutoCtrl.SignalID];
 
-        // Gestione errore
-        LAutoCtrl.Error := DMPLC.Error;
-        //if DMPLC.Error then
-          //LogStatus(pnlStatus, DMPLC.ErrorMessage, ltError);
-
+        LAutoCtrl.Error := LSignal.InError;
         // Set del valore
         LAutoCtrl.SetValue(LSignal.Value);
       end;
     end;
   end;
-
-  TimerUpdate.Enabled := not DMPLC.Error;
 end;
 
 procedure TFrameDebug.TimerUpdateTimer(Sender: TObject);

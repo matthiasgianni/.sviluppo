@@ -1,5 +1,6 @@
 {
   "signals": [
-  	{"DB": 40, "byte": 0, "bit": 0, "dim": 2, "Name": "Encoder"}
+  	{"DB": 120, "byte": 0, "bit": 0, "dim": 1, "Name": "Traslo in auto"},
+	{"DB": 199, "byte": 0, "bit": 1, "dim": 1, "Name": "Traslo in allarme"}
   ]
 }

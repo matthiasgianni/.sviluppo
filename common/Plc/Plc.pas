@@ -5,7 +5,7 @@ unit Plc;
 interface
 
 uses
-  nodave, Utils, System.SysUtils, System.Generics.Collections;
+  nodave, Utils, System.SysUtils, System.Generics.Collections, System.Classes;
 
 type
   TSignal = record
@@ -16,6 +16,7 @@ type
     SignalLength: Integer;
     Value: Variant;
     Name: String;
+    InError: Boolean;
   end;
 
   TSignalCollection = class(TList<TSignal>);
@@ -30,16 +31,32 @@ type
     FPLCIp: String;
     FPLCRack: Integer;
     FPLCSlot: Integer;
-  public
-    property PLCIp: String read FPLCIp write FPLCIp;
-    property Connected: Boolean read FConnected write FConnected;
 
+    FSignalCollection: TSignalCollection;
+    FReadingError: string;
+  public
+    property Connected: Boolean read FConnected write FConnected;
+    property SignalCollection: TSignalCollection read FSignalCollection write FSignalCollection;
+    property ReadingError: string read FReadingError write FReadingError;
+
+    procedure ReadSignalsFromPLC;
     procedure Disconnect;
 
     function Connect(var AError: string): Boolean;
-    procedure ReadSignalsFromPLC(Signals: TSignalCollection; var AError: String);
 
     constructor Create(AIp: String; ARack, ASlot: Integer); reintroduce;
+  end;
+
+  TPlcPollingThread = class(TThread)
+  private
+    FPLC: TPLC;
+    FInterval: Integer;
+    procedure DoPolling;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
+    destructor Destroy; override;
   end;
 
 implementation
@@ -96,19 +113,19 @@ begin
   end;
 end;
 
-procedure TPLC.ReadSignalsFromPLC(Signals: TSignalCollection; var AError: String);
+procedure TPLC.ReadSignalsFromPLC;
 var
   i: Integer;
   signal: TSignal;
   readResult: Integer;
   buffer: TArray<Byte>; // Buffer generico per contenere dati da PLC
 begin
-  AError := '';
+  FReadingError := '';
 
   // Cicla attraverso ogni segnale
-  for i := 0 to Signals.Count - 1 do
+  for i := 0 to FSignalCollection.Count - 1 do
   begin
-    signal := Signals[i];
+    signal := FSignalCollection[i];
 
     // Effettua la lettura dal PLC
     if signal.SignalLength = 1 then
@@ -127,11 +144,57 @@ begin
       else
         // Aggiorna il valore del dato a più byte nella lista
         signal.Value := Swap(PWord(@buffer[0])^);
-
-      Signals[i] := signal;
     end else
     begin
-      AError := string(daveStrerror(readResult));
+      FReadingError := string(daveStrerror(readResult));
+      signal.InError := True;
+    end;
+    FSignalCollection[i] := signal;
+  end;
+end;
+
+{ TPlcPollingThread }
+
+constructor TPlcPollingThread.Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
+begin
+  inherited Create(CreateSuspended);
+
+  FreeOnTerminate := True;
+  FPLC := APLC;
+  FInterval := AInterval;
+end;
+
+destructor TPlcPollingThread.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TPlcPollingThread.DoPolling;
+begin
+  while not Terminated do
+  begin
+    Synchronize(DoPolling);
+    Sleep(FInterval);
+  end;
+end;
+
+procedure TPlcPollingThread.Execute;
+var
+  LErrorMessage: string;
+begin
+  inherited;
+
+  try
+    if not FPLC.Connect(LErrorMessage) then
+      raise ECustomException.Create(LErrorMessage)
+    else
+      FPLC.ReadSignalsFromPLC;
+  except
+    on E: ECustomException do
+    begin
+      E.LogError;
+      FPLC.Disconnect;
     end;
   end;
 end;
