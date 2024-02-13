@@ -3,6 +3,9 @@ object FrameDebug: TFrameDebug
   Top = 0
   Width = 410
   Height = 312
+  Color = clBtnFace
+  ParentBackground = False
+  ParentColor = False
   TabOrder = 0
   object TimerUpdate: TTimer
     Enabled = False

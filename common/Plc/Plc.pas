@@ -144,6 +144,8 @@ begin
       else
         // Aggiorna il valore del dato a più byte nella lista
         signal.Value := Swap(PWord(@buffer[0])^);
+
+      signal.InError := False;
     end else
     begin
       FReadingError := string(daveStrerror(readResult));

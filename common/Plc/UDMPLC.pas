@@ -105,7 +105,7 @@ begin
           Signal.SignalLength := SignalObject.GetValue('dim').Value.ToInteger;
           Signal.Name := SignalObject.GetValue('Name').Value;
           Signal.SignalIndex := i;
-          Signal.InError := False;
+          Signal.InError := True;
 
           Signals.Add(Signal);
         end;

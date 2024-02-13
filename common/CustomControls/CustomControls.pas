@@ -30,8 +30,8 @@ type
   end;
 
 const
-  K_COLOR_TRUE = $00AF581F;
-  K_COLOR_FALSE = $00DE8143;
+  K_COLOR_TRUE = $005BF886;
+  K_COLOR_FALSE = $00057825;
 
 implementation
 
@@ -82,11 +82,11 @@ begin
     Caption := '';
     if AValue then
     begin
-      Color := $5BF886;
+      Color := K_COLOR_TRUE;
       Self.Font.Color := clBlack;
     end else
     begin
-      Color := $665BF8;
+      Color := K_COLOR_FALSE;
       Self.Font.Color := clWhite;
     end;
   end else
