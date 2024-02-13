@@ -7,22 +7,18 @@ uses
 
 type
   TDMStartup = class(TDataModule)
-    ComPortPolling: TTimer;
     procedure DataModuleCreate(Sender: TObject);
-    procedure ComPortPollingTimer(Sender: TObject);
   private
     { Private declarations }
     Config: TConfigSettings;
+    ComThread: TComThread;
+
     FComPortCom: string;
     FComPortTerminator: string;
+    FEnableComPort: Boolean;
   public
     { Public declarations }
     ComPort: TComPort;
-    ComPortData: string;
-    ComPortError: string;
-
-    procedure StartComPortPolling;
-    procedure StopComPortPolling;
   end;
 
 var
@@ -32,44 +28,20 @@ implementation
 
 {$R *.dfm}
 
-procedure TDMStartup.StartComPortPolling;
-begin
-  ComPortPolling.Enabled := True;
-end;
-
-procedure TDMStartup.StopComPortPolling;
-begin
-  ComPortPolling.Enabled := False;
-end;
-
-procedure TDMStartup.ComPortPollingTimer(Sender: TObject);
-begin
-  try
-    ComPortData := ComPort.ReadCom(ComPortError);
-    if ComPortError <> '' then
-    begin
-      ComPortPolling.Enabled := False;
-      raise ECustomException.Create(ComPortError);
-    end;
-  except
-    on E: ECustomException do
-    begin
-      E.LogError;
-    end;
-  end;
-end;
-
 procedure TDMStartup.DataModuleCreate(Sender: TObject);
 begin
   // ComPort settings
   Config := GetConfiguration('ComPort');
+  FEnableComPort := StrToBool(GetParameterValue(Config, 'Enable com port'));
   FComPortCom := GetParameterValue(Config, 'COM');
   FComPortTerminator := GetParameterValue(Config, 'Terminator');
 
-  ComPort := TComPort.Create;
-  ComPort.Port := FComPortCom;
-  ComPort.Terminator := FComPortTerminator;
-  ComPortPolling.Enabled := False;
+  if FEnableComPort then
+  begin
+    ComPort := TComPort.Create(FComPortCom, FComPortTerminator);
+    ComThread := TComThread.Create(True, ComPort, 1000);
+    ComThread.Start;
+  end;
 end;
 
 end.

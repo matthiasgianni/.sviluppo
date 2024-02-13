@@ -32,8 +32,6 @@ procedure TFormDebug.FormCreate(Sender: TObject);
 begin
   FFrameDebug := TFrameDebug.Create(FormDebug);
   FFrameDebug.Parent := FormDebug;
-
-  DMStartup.StartComPortPolling;
 end;
 
 end.

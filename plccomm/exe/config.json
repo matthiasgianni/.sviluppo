@@ -4,7 +4,7 @@
       "ConfigName": "PLC",
       "Parameters": [
         {"Name": "PLC Enabled", "Value": "True"},	  
-        {"Name": "Ip", "Value": "192.168.168.100"},
+        {"Name": "Ip", "Value": "192.168.1.100"},
         {"Name": "Rack", "Value": "0"},
         {"Name": "Slot", "Value": "1"}
       ]
@@ -23,7 +23,8 @@
 	{
       "ConfigName": "ComPort",
       "Parameters": [
-        {"Name": "COM", "Value": ""},
+	    {"Name": "Enable com port", "Value": "False"},
+	    {"Name": "COM", "Value": ""},
 		{"Name": "Terminator", "Value": "#13"}
       ]
     }

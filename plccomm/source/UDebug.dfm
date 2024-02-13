@@ -22,7 +22,5 @@ object FormDebug: TFormDebug
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 415
-    ExplicitWidth = 620
   end
 end
