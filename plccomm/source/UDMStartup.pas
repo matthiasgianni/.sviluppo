@@ -44,7 +44,19 @@ end;
 
 procedure TDMStartup.ComPortPollingTimer(Sender: TObject);
 begin
-  ComPortData := ComPort.ReadCom(ComPortError);
+  try
+    ComPortData := ComPort.ReadCom(ComPortError);
+    if ComPortError <> '' then
+    begin
+      ComPortPolling.Enabled := False;
+      raise ECustomException.Create(ComPortError);
+    end;
+  except
+    on E: ECustomException do
+    begin
+      E.LogError;
+    end;
+  end;
 end;
 
 procedure TDMStartup.DataModuleCreate(Sender: TObject);

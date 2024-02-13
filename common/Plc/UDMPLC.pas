@@ -18,6 +18,8 @@ type
     FError: Boolean;
     FErrorMessage: string;
 
+    procedure LoadPLCConfiguration;
+    procedure InitializePLC;
     procedure LoadSignalsJSON(var Signals: TSignalCollection);
     procedure ReadBytes;
   public
@@ -38,6 +40,19 @@ implementation
 {$R *.dfm}
 
 procedure TDMPLC.DataModuleCreate(Sender: TObject);
+begin
+  LoadPLCConfiguration;
+end;
+
+procedure TDMPLC.DataModuleDestroy(Sender: TObject);
+begin
+  FError := False;
+  FErrorMessage := '';
+  PLC.Disconnect;
+  Timer.Enabled := False;
+end;
+
+procedure TDMPLC.LoadPLCConfiguration;
 var
   IP: String;
   Rack, Slot: Integer;
@@ -61,44 +76,29 @@ begin
 
   PLC := TPLC.Create(IP, Rack, Slot);
   if PLCEnabled then
-  begin
-    if PLC.Connect then
+    InitializePLC;
+end;
+
+procedure TDMPLC.InitializePLC;
+begin
+  try
+    if PLC.Connect(FErrorMessage) then
     begin
       PLCConnected := True;
       if SignalCollection.Count > 0 then
         Timer.Enabled := True;
+    end
+    else
+      raise ECustomException.Create(FErrorMessage);
+  except
+    on E: ECustomException do
+    begin
+      E.LogError;
+      // Ensure cleanup in case of an exception
+      PLC.Disconnect;
+      Timer.Enabled := False;
     end;
-    // TODO: aggiungere errore se tentativo di connessione al plc fallisce
   end;
-end;
-
-procedure TDMPLC.DataModuleDestroy(Sender: TObject);
-begin
-  FError := False;
-  FErrorMessage := '';
-  PLC.Disconnect;
-  Timer.Enabled := False;
-end;
-
-procedure TDMPLC.ReadBytes;
-var
-  LError: String;
-begin
-  PLC.ReadSignalsFromPLC(SignalCollection, LError);
-  if LError <> '' then
-  begin
-    Timer.Enabled := False;
-    FError := True;
-    FErrorMessage := LError;
-    PLC.Disconnect;
-    //MessageDlg(LError, mtError, mbOKCancel, 0);
-  end;
-end;
-
-procedure TDMPLC.TimerTimer(Sender: TObject);
-begin
-  if PLCConnected then
-    ReadBytes;
 end;
 
 procedure TDMPLC.LoadSignalsJSON(var Signals: TSignalCollection);
@@ -147,6 +147,27 @@ begin
   finally
     JSONObject.Free;
   end;
+end;
+
+procedure TDMPLC.ReadBytes;
+var
+  LError: String;
+begin
+  PLC.ReadSignalsFromPLC(SignalCollection, LError);
+  if LError <> '' then
+  begin
+    Timer.Enabled := False;
+    FError := True;
+    FErrorMessage := LError;
+    PLC.Disconnect;
+    //MessageDlg(LError, mtError, mbOKCancel, 0);
+  end;
+end;
+
+procedure TDMPLC.TimerTimer(Sender: TObject);
+begin
+  if PLCConnected then
+    ReadBytes;
 end;
 
 end.

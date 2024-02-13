@@ -5,7 +5,7 @@ unit Plc;
 interface
 
 uses
-  nodave, Utils, System.Generics.Collections;
+  nodave, Utils, System.SysUtils, System.Generics.Collections;
 
 type
   TSignal = record
@@ -36,7 +36,7 @@ type
 
     procedure Disconnect;
 
-    function Connect: Boolean;
+    function Connect(var AError: string): Boolean;
     procedure ReadSignalsFromPLC(Signals: TSignalCollection; var AError: String);
 
     constructor Create(AIp: String; ARack, ASlot: Integer); reintroduce;
@@ -54,12 +54,13 @@ begin
   FConnected := False;
 end;
 
-function TPLC.Connect: Boolean;
+function TPLC.Connect(var AError: string): Boolean;
 var
   LIp: AnsiString;
   I: Integer;
 begin
   FConnected := False;
+  AError := '';
 
   LIp := FPLCIp + #0;
 
@@ -82,6 +83,7 @@ begin
     end;
   end;
   Result := FConnected;
+  AError := Format('Errore in connessione al plc (%s)', [FPLCIp]);
 end;
 
 procedure TPLC.Disconnect;

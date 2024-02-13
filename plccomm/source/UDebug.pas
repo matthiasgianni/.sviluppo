@@ -29,13 +29,11 @@ uses
   UDMStartup;
 
 procedure TFormDebug.FormCreate(Sender: TObject);
-var
-  LData: string;
 begin
   FFrameDebug := TFrameDebug.Create(FormDebug);
   FFrameDebug.Parent := FormDebug;
 
-  //DMStartup.StartComPortPolling;
+  DMStartup.StartComPortPolling;
 end;
 
 end.

@@ -28,14 +28,12 @@ begin
 end;
 
 function TComPort.ReadCom(var AError: String): string;
-var
-  LData: string;
 begin
-  if FPort = '' then
-  begin
-    AError := 'Nessuna porta specificata';
-    Exit;
-  end;
+//  if FPort = '' then
+//  begin
+//    AError := 'Nessuna porta specificata';
+//    Exit;
+//  end;
 
   AError := '';
   try

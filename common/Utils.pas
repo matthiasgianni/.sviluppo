@@ -21,6 +21,12 @@ type
     Parameters: TArray<TParameter>;
   end;
 
+  ECustomException = class(Exception)
+  public
+    constructor Create(const Msg: string);
+    procedure LogError;
+  end;
+
   // Custom message
   procedure ShowCustomMessageForm(AParent: TWinControl; AType: TLogType; const AMessage: String);
   procedure LogStatus(ASurface: TControl; AMsg: String; ALogType: TLogType);
@@ -205,6 +211,41 @@ begin
 
   LFrame.SetIcon(LIconID);
   LFrame.SetMessage(AMessage);
+end;
+
+constructor ECustomException.Create(const Msg: string);
+begin
+  inherited Create(Msg);
+end;
+
+procedure ECustomException.LogError;
+var
+  LogFileName: string;
+  LogFileStream: TFileStream;
+  LogContent: TStringList;
+begin
+  LogFileName := ChangeFileExt(ParamStr(0), '.log');
+
+  LogFileStream := TFileStream.Create(LogFileName, fmOpenWrite or fmShareDenyWrite);
+  try
+    // Posiziona il puntatore alla fine del file
+    LogFileStream.Seek(0, soEnd);
+
+    LogContent := TStringList.Create;
+    try
+      // Aggiungi le nuove informazioni sull'errore al file di log
+      LogContent.Add('Date/Time: ' + DateTimeToStr(Now));
+      LogContent.Add('Error Message: ' + Message);
+      LogContent.Add('--------------------------------------------------------------------------------');
+
+      // Salva il contenuto nel file di log
+      LogContent.SaveToStream(LogFileStream);
+    finally
+      LogContent.Free;
+    end;
+  finally
+    LogFileStream.Free;
+  end;
 end;
 
 end.
