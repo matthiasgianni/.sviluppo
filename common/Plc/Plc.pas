@@ -42,7 +42,7 @@ type
     procedure ReadSignalsFromPLC;
     procedure Disconnect;
 
-    function Connect(var AError: string): Boolean;
+    function Connect: Boolean;
 
     constructor Create(AIp: String; ARack, ASlot: Integer); reintroduce;
   end;
@@ -71,13 +71,12 @@ begin
   FConnected := False;
 end;
 
-function TPLC.Connect(var AError: string): Boolean;
+function TPLC.Connect: Boolean;
 var
   LIp: AnsiString;
   I: Integer;
 begin
   FConnected := False;
-  AError := '';
 
   LIp := FPLCIp + #0;
 
@@ -100,7 +99,6 @@ begin
     end;
   end;
   Result := FConnected;
-  AError := Format('Errore in connessione al plc (%s)', [FPLCIp]);
 end;
 
 procedure TPLC.Disconnect;
@@ -168,36 +166,23 @@ end;
 
 destructor TPlcPollingThread.Destroy;
 begin
-
   inherited;
 end;
 
 procedure TPlcPollingThread.DoPolling;
 begin
-  while not Terminated do
-  begin
-    Synchronize(DoPolling);
-    Sleep(FInterval);
-  end;
+  if FPLC.Connected then
+    FPLC.ReadSignalsFromPLC;
 end;
 
 procedure TPlcPollingThread.Execute;
-var
-  LErrorMessage: string;
 begin
-  inherited;
-
-  try
-    if not FPLC.Connect(LErrorMessage) then
-      raise ECustomException.Create(LErrorMessage)
-    else
-      FPLC.ReadSignalsFromPLC;
-  except
-    on E: ECustomException do
-    begin
-      E.LogError;
-      FPLC.Disconnect;
-    end;
+  while not Terminated do
+  begin
+    // Esegui l'operazione di polling
+    DoPolling;
+    // Attendi per l'intervallo di tempo specificato prima di procedere con il prossimo ciclo di polling
+    Sleep(FInterval);
   end;
 end;
 

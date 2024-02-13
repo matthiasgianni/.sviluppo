@@ -61,8 +61,7 @@ begin
   begin
     PLC := TPLC.Create(IP, Rack, Slot);
     PLC.SignalCollection := FSignalCollection;
-    PLCThread := TPlcPollingThread.Create(True, PLC, 1000);
-
+    PLCThread := TPlcPollingThread.Create(True, PLC, 500);
     PLCThread.Start;
   end;
 end;

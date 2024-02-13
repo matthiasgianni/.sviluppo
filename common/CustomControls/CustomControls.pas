@@ -73,6 +73,7 @@ begin
   begin
     Color := clGray;
     Caption := 'error';
+    Font.Color := clWhite;
     Exit;
   end;
 
@@ -83,15 +84,15 @@ begin
     if AValue then
     begin
       Color := K_COLOR_TRUE;
-      Self.Font.Color := clBlack;
+      Font.Color := clBlack;
     end else
     begin
       Color := K_COLOR_FALSE;
-      Self.Font.Color := clWhite;
+      Font.Color := clWhite;
     end;
   end else
   begin
-    Self.Font.Color := clBlack;
+    Font.Color := clBlack;
     Color := cLWhite;
   end;
 end;

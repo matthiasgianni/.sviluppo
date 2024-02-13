@@ -1,6 +1,11 @@
 {
   "signals": [
-  	{"DB": 120, "byte": 0, "bit": 0, "dim": 1, "Name": "Traslo in auto"},
-	{"DB": 120, "byte": 0, "bit": 1, "dim": 1, "Name": "Traslo in allarme"}
+  	{"DB": 10, "byte": 480, "bit": 0, "dim": 1, "Name": "Elev. in allarme"},
+	{"DB": 10, "byte": 480, "bit": 1, "dim": 1, "Name": "Elev. in marcia"},
+	{"DB": 10, "byte": 480, "bit": 2, "dim": 1, "Name": "Elev. in manuale"},
+	{"DB": 10, "byte": 480, "bit": 3, "dim": 1, "Name": "Elev. in automatico"},
+	{"DB": 10, "byte": 480, "bit": 4, "dim": 1, "Name": "Elev. in manutenzione"},
+	{"DB": 10, "byte": 480, "bit": 5, "dim": 1, "Name": "Elev. manuale in corso"},
+	{"DB": 10, "byte": 480, "bit": 6, "dim": 1, "Name": "Elev. in azzeramento"}
   ]
 }
