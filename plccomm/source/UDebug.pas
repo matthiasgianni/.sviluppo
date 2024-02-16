@@ -32,6 +32,7 @@ procedure TFormDebug.FormCreate(Sender: TObject);
 begin
   FFrameDebug := TFrameDebug.Create(FormDebug);
   FFrameDebug.Parent := FormDebug;
+  FFrameDebug.Align := alClient;
 end;
 
 end.

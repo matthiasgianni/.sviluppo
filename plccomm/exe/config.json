@@ -13,8 +13,8 @@
       "ConfigName": "Debug",
       "Parameters": [
         {"Name": "Show", "Value": "True"},
-		{"Name": "Columns", "Value": "1"},
-		{"Name": "HorizontalMargin", "Value": "25"},
+		{"Name": "Columns", "Value": "2"},
+		{"Name": "HorizontalMargin", "Value": "75"},
 		{"Name": "VerticalMargin", "Value": "30"},
 		{"Name": "ControlWidth", "Value": "50"},
 		{"Name": "ControlHeight", "Value": "20"}

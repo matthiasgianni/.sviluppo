@@ -37,6 +37,9 @@ type
   function GetParameterValue(const Config: TConfigSettings; const ParamName: string;
     const DefaultValue: string = ''): string;
 
+  // Bytes...
+  function SwapLong(Value: Integer): Integer;
+
 var
   Configurations: array of TConfigSettings;
 
@@ -246,6 +249,14 @@ begin
   finally
     LogFileStream.Free;
   end;
+end;
+
+function SwapLong(Value: Integer): Integer;
+begin
+  Result := ((Value and $FF) shl 24) or
+            ((Value and $FF00) shl 8) or
+            ((Value and $FF0000) shr 8) or
+            ((Value and $FF000000) shr 24);
 end;
 
 end.

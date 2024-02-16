@@ -136,9 +136,16 @@ begin
       if signal.SignalLength = 1 then
         // Aggiorna il valore del singolo bit nella lista
         signal.Value := Ord((buffer[0] and (1 shl signal.BitIndex)) <> 0)
-      else
+      else if signal.SignalLength = 2 then
         // Aggiorna il valore del dato a più byte nella lista
-        signal.Value := Swap(PWord(@buffer[0])^);
+        signal.Value := Swap(PWord(@buffer[0])^)
+      else if signal.SignalLength = 4 then
+      begin
+        // Leggi i 4 byte dal buffer come un intero a 32 bit
+        signal.Value := PInteger(@buffer[0])^;
+        // Effettua lo swap dei byte se necessario
+        signal.Value := SwapLong(signal.Value);
+      end;
 
       signal.InError := False;
     end else
