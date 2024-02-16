@@ -40,9 +40,8 @@ type
     property ReadingError: string read FReadingError write FReadingError;
 
     procedure ReadSignalsFromPLC;
+    procedure Connect;
     procedure Disconnect;
-
-    function Connect: Boolean;
 
     constructor Create(AIp: String; ARack, ASlot: Integer); reintroduce;
   end;
@@ -71,10 +70,9 @@ begin
   FConnected := False;
 end;
 
-function TPLC.Connect: Boolean;
+procedure TPLC.Connect;
 var
   LIp: AnsiString;
-  I: Integer;
 begin
   FConnected := False;
 
@@ -98,7 +96,6 @@ begin
         daveDisconnectAdapter(FdI);
     end;
   end;
-  Result := FConnected;
 end;
 
 procedure TPLC.Disconnect;
@@ -171,6 +168,16 @@ end;
 
 procedure TPlcPollingThread.DoPolling;
 begin
+  if not FPLC.Connected then
+  begin
+    try
+      FPLC.Connect;
+    except
+      on E: ECustomException do
+        E.LogError;
+    end;
+  end;
+
   if FPLC.Connected then
     FPLC.ReadSignalsFromPLC;
 end;

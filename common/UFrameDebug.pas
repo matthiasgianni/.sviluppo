@@ -21,7 +21,7 @@ type
     FControlHeight: Integer;
 
     procedure GenerateControls;
-    procedure Update;
+    procedure Refresh;
   public
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
@@ -96,7 +96,7 @@ begin
   end;
 end;
 
-procedure TFrameDebug.Update;
+procedure TFrameDebug.Refresh;
 var
   I: Integer;
   LSignal: TSignal;
@@ -125,7 +125,7 @@ end;
 
 procedure TFrameDebug.TimerUpdateTimer(Sender: TObject);
 begin
-  Update;
+  Refresh;
 end;
 
 end.

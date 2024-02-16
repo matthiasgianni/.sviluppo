@@ -39,6 +39,7 @@ end;
 procedure TDMPLC.DataModuleDestroy(Sender: TObject);
 begin
   PLC.Free;
+  PLCThread.Terminate;
 end;
 
 procedure TDMPLC.LoadPLCConfiguration;
