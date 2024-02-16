@@ -8,8 +8,11 @@ uses
   nodave, Utils, System.SysUtils, System.Generics.Collections, System.Classes;
 
 type
+  TSignalType = (RX, TX);
+
   TSignal = record
     SignalIndex: Integer;
+    SignalType: TSignalType;
     DataBlock: Integer;
     ByteIndex: Integer;
     BitIndex: Integer;
@@ -39,7 +42,8 @@ type
     property SignalCollection: TSignalCollection read FSignalCollection write FSignalCollection;
     property ReadingError: string read FReadingError write FReadingError;
 
-    procedure ReadSignalsFromPLC;
+    procedure RXPLC;
+    procedure TXPLC;
     procedure Connect;
     procedure Disconnect;
 
@@ -50,6 +54,7 @@ type
   private
     FPLC: TPLC;
     FInterval: Integer;
+    FFirstIteration: Boolean;
     procedure DoPolling;
   protected
     procedure Execute; override;
@@ -108,7 +113,7 @@ begin
   end;
 end;
 
-procedure TPLC.ReadSignalsFromPLC;
+procedure TPLC.RXPLC;
 var
   i: Integer;
   signal: TSignal;
@@ -121,6 +126,10 @@ begin
   for i := 0 to FSignalCollection.Count - 1 do
   begin
     signal := FSignalCollection[i];
+
+    // Skip segnale se non di lettura
+    if not (signal.SignalType = TSignalType.RX) then
+      Continue;
 
     // Effettua la lettura dal PLC
     if signal.SignalLength = 1 then
@@ -140,10 +149,8 @@ begin
         // Aggiorna il valore del dato a più byte nella lista
         signal.Value := Swap(PWord(@buffer[0])^)
       else if signal.SignalLength = 4 then
-      begin
         // Leggi i 4 byte dal buffer come un intero a 32 bit
         signal.Value := SwapLong(PInteger(@buffer[0])^);
-      end;
 
       signal.InError := False;
     end else
@@ -152,6 +159,50 @@ begin
       signal.InError := True;
     end;
     FSignalCollection[i] := signal;
+  end;
+end;
+
+procedure TPLC.TXPLC;
+var
+  i: Integer;
+  signal: TSignal;
+  writeResult: Integer;
+  buffer: TArray<Byte>;
+begin
+  // Cicla attraverso ogni segnale
+  for i := 0 to FSignalCollection.Count - 1 do
+  begin
+    signal := FSignalCollection[i];
+
+    // Skip segnale se non di scrittura
+    if not (signal.SignalType = TSignalType.TX) then
+      Continue;
+
+    // Imposta il buffer in base alla lunghezza del segnale
+    SetLength(buffer, signal.SignalLength);
+
+    // Inizializza il buffer a zero per evitare valori non desiderati
+    FillChar(buffer[0], Length(buffer), 0);
+
+    // Scrivi il valore del segnale nel buffer solo se la lunghezza del buffer è 1
+    if signal.SignalLength = 1 then
+      buffer[0] := signal.Value
+    else
+    begin
+      // Qui dovresti implementare la logica per convertire il valore del segnale in un array di byte
+      // e copiarlo nel buffer in base all'ordinamento dei byte richiesto dal PLC.
+      // Ad esempio, se il segnale è un intero a 16 bit, potresti fare qualcosa del genere:
+      // PWord(@buffer[0])^ := Swap(signal.Value);
+    end;
+
+    // Scrivi i dati nel PLC utilizzando un buffer separato per ciascun segnale
+    writeResult := daveWriteBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, Length(buffer), @buffer[0]);
+
+    // Verifico il risultato della scrittura
+    if writeResult = 0 then
+      signal.InError := False
+    else
+      signal.InError := True;
   end;
 end;
 
@@ -184,11 +235,20 @@ begin
   end;
 
   if FPLC.Connected then
-    FPLC.ReadSignalsFromPLC;
+  begin
+    if FFirstIteration then
+    begin
+      FPLC.TXPLC;
+      FFirstIteration := False;
+    end;
+
+    FPLC.RXPLC;
+  end;
 end;
 
 procedure TPlcPollingThread.Execute;
 begin
+  FFirstIteration := True;
   while not Terminated do
   begin
     // Esegui l'operazione di polling

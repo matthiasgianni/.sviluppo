@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   System.Math, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.WinXCtrls, Vcl.Clipbrd, Plc;
+  Vcl.WinXCtrls, Vcl.Clipbrd, Plc, Utils;
 
 type
   TAutomationControl = class(TPanel)
@@ -34,6 +34,9 @@ const
   K_COLOR_FALSE = $00057825;
 
 implementation
+
+uses
+  UDMPLC;
 
 { TAutomationControl }
 
@@ -98,14 +101,23 @@ begin
 end;
 
 procedure TAutomationControl.ControlClick(Sender: TObject);
+var
+  LSignalIdx: Integer;
+  LValue: Variant;
 begin
   if Sender is TAutomationControl then
   begin
     try
-      if TAutomationControl(Sender).Caption = '' then
-        Exit;
-      Clipboard.Clear;
-      Clipboard.AsText := TAutomationControl(Sender).Caption;
+      if TAutomationControl(Sender).Caption <> '' then
+      begin
+        Clipboard.Clear;
+        Clipboard.AsText := TAutomationControl(Sender).Caption;
+      end;
+
+      // TEST TX
+      LSignalIdx := TAutomationControl(Sender).SignalID;
+      LValue := DMPLC.ReadValue(LSignalIdx);
+      DMPLC.WriteValue(LSignalIdx, not LValue);
     except
       on E: Exception do
         MessageDlg(E.Message, mtError, [mbOk], 0);

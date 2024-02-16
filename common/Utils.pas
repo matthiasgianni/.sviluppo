@@ -8,7 +8,6 @@ uses
   System.Generics.Collections, UInfoFrame;
 
 type
-  TSignalType = (stBool, stInt);
   TLogType = (ltOk, ltWarning, ltError);
 
   TParameter = record
@@ -36,6 +35,9 @@ type
   function GetConfiguration(const ConfigName: string): TConfigSettings;
   function GetParameterValue(const Config: TConfigSettings; const ParamName: string;
     const DefaultValue: string = ''): string;
+
+  // Conversion
+  function IntToBool(const AValue: Integer): Boolean;
 
   // Bytes...
   function SwapLong(Value: Integer): Integer;

@@ -1,0 +1,13 @@
+{
+  "signals": [
+  	{"Type": "RX", "DB": 10, "byte": 480, "bit": 0, "Name": "Elev. in allarme"},
+	{"Type": "RX", "DB": 10, "byte": 480, "bit": 1, "Name": "Elev. in marcia"},
+	{"Type": "TX", "DB": 10, "byte": 480, "bit": 2, "Name": "Elev. in manuale"},
+	{"Type": "RX", "DB": 10, "byte": 480, "bit": 3, "Name": "Elev. in automatico"},
+	{"Type": "RX", "DB": 10, "byte": 480, "bit": 4, "Name": "Elev. in manutenzione"},
+	{"Type": "RX", "DB": 10, "byte": 480, "bit": 5, "Name": "Elev. manuale in corso"},
+	{"Type": "RX", "DB": 10, "byte": 480, "bit": 6, "Name": "Elev. in azzeramento"},
+	{"Type": "RX", "DB": 10, "byte": 504, "bit": 0, "dim": 2, "Name": "Pos. Y"},
+	{"Type": "RX", "DB": 10, "byte": 516, "bit": 0, "dim": 4, "Name": "Encoder Y"}	
+  ]
+}

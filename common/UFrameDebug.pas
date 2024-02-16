@@ -83,7 +83,8 @@ begin
     Panel.SignalLength := LSignal.SignalLength;
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
-    Panel.Cursor := crHandPoint;
+    if LSignal.SignalType = TSignalType.TX then
+      Panel.Cursor := crHandPoint;
 
     // Crea la label
     LabelDesc := TLabel.Create(Self);

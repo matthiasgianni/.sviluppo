@@ -22,6 +22,9 @@ type
     PLC: TPLC;
     PLCThread: TPlcPollingThread;
     PLCConnected: Boolean;
+
+    procedure WriteValue(ASignalIdx: Integer; AValue: Variant);
+    function ReadValue(ASignalIdx: Integer): Variant;
   end;
 
 var
@@ -76,6 +79,7 @@ var
   i: Integer;
   Signal: TSignal;
   LFileName: String;
+  LSignalDim: TJSONValue;
 begin
   LFileName := ExtractFilePath(ParamStr(0)) + 'SignalCollection.json';
   if not FileExists(LFileName) then
@@ -98,14 +102,24 @@ begin
         begin
           SignalObject := SignalsArray.Items[i] as TJSONObject;
 
+          if SignalObject.GetValue('Type').Value = 'RX' then
+            Signal.SignalType := TSignalType.RX
+          else
+            Signal.SignalType := TSignalType.TX;
+
           Signal.DataBlock := SignalObject.GetValue('DB').Value.ToInteger;
           Signal.ByteIndex := SignalObject.GetValue('byte').Value.ToInteger;
           Signal.BitIndex := SignalObject.GetValue('bit').Value.ToInteger;
           Signal.Value := 0;
-          Signal.SignalLength := SignalObject.GetValue('dim').Value.ToInteger;
+
+          if SignalObject.TryGetValue('dim', LSignalDim) then
+            Signal.SignalLength := LSignalDim.Value.ToInteger
+          else
+            Signal.SignalLength := 1;
+
           Signal.Name := SignalObject.GetValue('Name').Value;
           Signal.SignalIndex := i;
-          Signal.InError := True;
+          Signal.InError := False;
 
           Signals.Add(Signal);
         end;
@@ -113,6 +127,53 @@ begin
     end;
   finally
     JSONObject.Free;
+  end;
+end;
+
+function TDMPLC.ReadValue(ASignalIdx: Integer): Variant;
+var
+  i: Integer;
+  LModifiedSignal: TSignal;
+  LResult: Variant;
+begin
+  for i := 0 to PLC.SignalCollection.Count - 1 do
+  begin
+    if PLC.SignalCollection[i].SignalIndex = ASignalIdx then
+    begin
+      LResult := PLC.SignalCollection[i].Value;
+      if LResult = 0 then
+        LResult := False;
+      if LResult = 1 then
+        LResult := True;
+      Result := LResult;
+      Break;
+    end;
+  end;
+end;
+
+procedure TDMPLC.WriteValue(ASignalIdx: Integer; AValue: Variant);
+var
+  i: Integer;
+  LModifiedSignal: TSignal;
+begin
+  for i := 0 to PLC.SignalCollection.Count - 1 do
+  begin
+    if PLC.SignalCollection[i].SignalIndex = ASignalIdx then
+    begin
+      // CONTROLLO DOPPIO (ANCHE IN METODO PLC)
+      if not (PLC.SignalCollection[i].SignalType = TSignalType.TX) then
+        Exit;
+
+      LModifiedSignal := PLC.SignalCollection[i];
+      // Modifica il valore del segnale
+      LModifiedSignal.Value := AValue;
+      // Re-inserisci il segnale modificato nella lista nella stessa posizione
+      PLC.SignalCollection[i] := LModifiedSignal;
+
+      PLC.TXPLC;
+
+      Exit;
+    end;
   end;
 end;
 
