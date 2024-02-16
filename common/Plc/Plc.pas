@@ -142,9 +142,7 @@ begin
       else if signal.SignalLength = 4 then
       begin
         // Leggi i 4 byte dal buffer come un intero a 32 bit
-        signal.Value := PInteger(@buffer[0])^;
-        // Effettua lo swap dei byte se necessario
-        signal.Value := SwapLong(signal.Value);
+        signal.Value := SwapLong(PInteger(@buffer[0])^);
       end;
 
       signal.InError := False;
