@@ -25,6 +25,7 @@ type
 
     procedure WriteValue(ASignalIdx: Integer; AValue: Variant);
     function ReadValue(ASignalIdx: Integer): Variant;
+    function GetSignal(ASignalIdx: Integer): TSignal;
   end;
 
 var
@@ -132,49 +133,42 @@ end;
 
 function TDMPLC.ReadValue(ASignalIdx: Integer): Variant;
 var
-  i: Integer;
-  LModifiedSignal: TSignal;
-  LResult: Variant;
+  LValue: Variant;
 begin
-  for i := 0 to PLC.SignalCollection.Count - 1 do
-  begin
-    if PLC.SignalCollection[i].SignalIndex = ASignalIdx then
-    begin
-      LResult := PLC.SignalCollection[i].Value;
-      if LResult = 0 then
-        LResult := False;
-      if LResult = 1 then
-        LResult := True;
-      Result := LResult;
-      Break;
-    end;
-  end;
+  LValue := GetSignal(ASignalIdx).Value;
+
+  // Boolean conversion
+  if LValue = 0 then
+    LValue := False;
+  if LValue = 1 then
+    LValue := True;
+
+  Result := LValue;
 end;
 
 procedure TDMPLC.WriteValue(ASignalIdx: Integer; AValue: Variant);
 var
-  i: Integer;
-  LModifiedSignal: TSignal;
+  LSignal, LTmpSignal: TSignal;
 begin
-  for i := 0 to PLC.SignalCollection.Count - 1 do
-  begin
-    if PLC.SignalCollection[i].SignalIndex = ASignalIdx then
-    begin
-      // CONTROLLO DOPPIO (ANCHE IN METODO PLC)
-      if not (PLC.SignalCollection[i].SignalType = TSignalType.TX) then
-        Exit;
+  LSignal := GetSignal(ASignalIdx);
 
-      LModifiedSignal := PLC.SignalCollection[i];
-      // Modifica il valore del segnale
-      LModifiedSignal.Value := AValue;
-      // Re-inserisci il segnale modificato nella lista nella stessa posizione
-      PLC.SignalCollection[i] := LModifiedSignal;
+  // CONTROLLO DOPPIO (ANCHE IN METODO PLC)
+  if not (LSignal.SignalType = TSignalType.TX) then
+    Exit;
 
-      PLC.TXPLC;
+  LTmpSignal := LSignal;
 
-      Exit;
-    end;
-  end;
+  // Modifica il valore del segnale
+  LTmpSignal.Value := AValue;
+  // Re-inserisci il segnale modificato nella lista nella stessa posizione
+  PLC.SignalCollection[ASignalIdx] := LTmpSignal;
+
+  PLC.TXPLC;
+end;
+
+function TDMPLC.GetSignal(ASignalIdx: Integer): TSignal;
+begin
+  Result := PLC.SignalCollection[ASignalIdx];
 end;
 
 end.

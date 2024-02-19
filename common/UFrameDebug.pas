@@ -5,11 +5,14 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
-  Utils, CustomControls, Plc;
+  Utils, CustomControls, Plc, Vcl.ComCtrls;
 
 type
   TFrameDebug = class(TFrame)
     TimerUpdate: TTimer;
+    PageControl: TPageControl;
+    tsRX: TTabSheet;
+    tsTX: TTabSheet;
     procedure TimerUpdateTimer(Sender: TObject);
   private
     { Private declarations }
@@ -20,7 +23,8 @@ type
     FControlWidth: Integer;
     FControlHeight: Integer;
 
-    procedure GenerateControls;
+    procedure GenerateControls; overload;
+    procedure GenerateControls(ASignalType: TSignalType); overload;
     procedure Refresh;
   public
     { Public declarations }
@@ -42,6 +46,7 @@ begin
 
   // Configrazioni base per il frame
   FConfig := GetConfiguration('Debug');
+
   FColNum := StrToInt(GetParameterValue(FConfig, 'Columns', '3'));
 
   FHorizontalMargin := StrToInt(GetParameterValue(FConfig, 'HorizontalMargin', '40'));
@@ -59,36 +64,54 @@ begin
 end;
 
 procedure TFrameDebug.GenerateControls;
+begin
+  // Generazione controlli LETTURA
+  GenerateControls(TSignalType.RX);
+  // Generazione controlli SCRITTURA
+  GenerateControls(TSignalType.TX);
+end;
+
+procedure TFrameDebug.GenerateControls(ASignalType: TSignalType);
 var
   I, Row, Column: Integer;
   Panel: TAutomationControl;
   LabelDesc: TLabel;
   LSignal: TSignal;
+  LParent: TWinControl;
 begin
+  if ASignalType = TSignalType.RX then
+    LParent := tsRX
+  else
+    LParent := tsTX;
+
   I := 0;
   for LSignal in DMPLC.PLC.SignalCollection do
   begin
+    if LSignal.SignalType <> ASignalType then
+      Continue;
+
     Row := I div FColNum;
     Column := I mod FColNum;
 
     // Crea il pannello
-    Panel := TAutomationControl.Create(Self);
-    Panel.Parent := Self;
+    Panel := TAutomationControl.Create(LParent);
+    Panel.Parent := LParent;
     Panel.Left := FHorizontalMargin + Column * (FControlWidth + FHorizontalMargin);
     Panel.Top := FVerticalMargin + Row * (FControlHeight + FVerticalMargin);
     Panel.Width := FControlWidth;
     Panel.Height := FControlHeight;
 
+    if LSignal.SignalType = TSignalType.TX then
+      Panel.Cursor := crHandPoint;
+
     Panel.SignalID := LSignal.SignalIndex;
     Panel.SignalLength := LSignal.SignalLength;
     Panel.Name := 'AUTOMATIONCONTROL_' + IntToStr(LSignal.SignalIndex);
     Panel.Caption := '';
-    if LSignal.SignalType = TSignalType.TX then
-      Panel.Cursor := crHandPoint;
 
     // Crea la label
-    LabelDesc := TLabel.Create(Self);
-    LabelDesc.Parent := Self;
+    LabelDesc := TLabel.Create(LParent);
+    LabelDesc.Parent := LParent;
     LabelDesc.Top := FVerticalMargin + Row * (FControlHeight + FVerticalMargin) - LabelDesc.Height;
     LabelDesc.Left := Panel.Left;
     LabelDesc.Caption := LSignal.Name;
@@ -99,26 +122,30 @@ end;
 
 procedure TFrameDebug.Refresh;
 var
-  I: Integer;
+  I, J: Integer;
   LSignal: TSignal;
   LAutoCtrl: TAutomationControl;
 begin
-  for I := 0 to Pred(Self.ControlCount) do
+  for I := 0 to Pred(PageControl.PageCount) do
   begin
-    if Self.Controls[I] is TAutomationControl then
+    for J := 0 to Pred(PageControl.Pages[I].ControlCount) do
     begin
-      LAutoCtrl := TAutomationControl(Self.Controls[I]);
-
-      // Ottieni l'indice del segnale associato al checkbox dal Tag
-      if (LAutoCtrl.SignalID >= 0) and (LAutoCtrl.SignalId < DMPLC.PLC.SignalCollection.Count) and
-         (Pos('AUTOMATIONCONTROL_', LAutoCtrl.Name) > 0) then
+      if PageControl.Pages[I].Controls[J] is TAutomationControl then
       begin
-        // Segnale dalla collezione
-        LSignal := DMPLC.PLC.SignalCollection[LAutoCtrl.SignalID];
+        LAutoCtrl := TAutomationControl(PageControl.Pages[I].Controls[J]);
 
-        LAutoCtrl.Error := LSignal.InError;
-        // Set del valore
-        LAutoCtrl.SetValue(LSignal.Value);
+        // Ottieni l'indice del segnale associato al checkbox dal Tag
+        if (LAutoCtrl.SignalID >= 0) and (LAutoCtrl.SignalId < DMPLC.PLC.SignalCollection.Count) and
+           (Pos('AUTOMATIONCONTROL_', LAutoCtrl.Name) > 0) then
+        begin
+          // Segnale dalla collezione
+          LSignal := DMPLC.GetSignal(LAutoCtrl.SignalID);
+
+          LAutoCtrl.Error := LSignal.InError;
+
+          // Set del valore
+          LAutoCtrl.SetValue(LSignal.Value);
+        end;
       end;
     end;
   end;

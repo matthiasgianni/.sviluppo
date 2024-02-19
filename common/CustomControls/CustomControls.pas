@@ -10,7 +10,6 @@ uses
 type
   TAutomationControl = class(TPanel)
   private
-    FText: String;
     FValue: Variant;
     FSignalID: Integer;
     FSignalLength: Integer;
@@ -20,7 +19,6 @@ type
   published
     procedure SetValue(AValue: Variant);
   public
-    property Text: String read FText write FText;
     property Value: Variant read FValue write SetValue;
     property SignalID: Integer read FSignalID write FSignalID;
     property SignalLength: Integer read FSignalLength write FSignalLength;
@@ -102,8 +100,8 @@ end;
 
 procedure TAutomationControl.ControlClick(Sender: TObject);
 var
-  LSignalIdx: Integer;
   LValue: Variant;
+  LSignal: TSignal;
 begin
   if Sender is TAutomationControl then
   begin
@@ -115,9 +113,12 @@ begin
       end;
 
       // TEST TX
-      LSignalIdx := TAutomationControl(Sender).SignalID;
-      LValue := DMPLC.ReadValue(LSignalIdx);
-      DMPLC.WriteValue(LSignalIdx, not LValue);
+      LSignal := DMPLC.GetSignal(TAutomationControl(Sender).SignalID);
+      if LSignal.SignalType = TSignalType.TX then
+      begin
+        LValue := DMPLC.ReadValue(LSignal.SignalIndex);
+        DMPLC.WriteValue(LSignal.SignalIndex, not LValue);
+      end;
     except
       on E: Exception do
         MessageDlg(E.Message, mtError, [mbOk], 0);

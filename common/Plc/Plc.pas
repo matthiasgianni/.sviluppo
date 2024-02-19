@@ -186,14 +186,12 @@ begin
 
     // Scrivi il valore del segnale nel buffer solo se la lunghezza del buffer è 1
     if signal.SignalLength = 1 then
-      buffer[0] := signal.Value
-    else
-    begin
-      // Qui dovresti implementare la logica per convertire il valore del segnale in un array di byte
-      // e copiarlo nel buffer in base all'ordinamento dei byte richiesto dal PLC.
-      // Ad esempio, se il segnale è un intero a 16 bit, potresti fare qualcosa del genere:
-      // PWord(@buffer[0])^ := Swap(signal.Value);
-    end;
+      buffer[0] := signal.Value;
+
+    // Qui dovresti implementare la logica per convertire il valore del segnale in un array di byte
+    // e copiarlo nel buffer in base all'ordinamento dei byte richiesto dal PLC.
+    // Ad esempio, se il segnale è un intero a 16 bit, potresti fare qualcosa del genere:
+    // PWord(@buffer[0])^ := Swap(signal.Value);
 
     // Scrivi i dati nel PLC utilizzando un buffer separato per ciascun segnale
     writeResult := daveWriteBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, Length(buffer), @buffer[0]);
