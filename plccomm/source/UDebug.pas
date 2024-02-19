@@ -33,6 +33,9 @@ begin
   FFrameDebug := TFrameDebug.Create(FormDebug);
   FFrameDebug.Parent := FormDebug;
   FFrameDebug.Align := alClient;
+
+  AlphaBlend := True;
+  AlphaBlendValue := 240;
 end;
 
 end.

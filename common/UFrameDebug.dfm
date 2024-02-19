@@ -12,9 +12,24 @@ object FrameDebug: TFrameDebug
     Top = 0
     Width = 410
     Height = 312
+    ParentCustomHint = False
     ActivePage = tsRX
     Align = alClient
+    BiDiMode = bdLeftToRight
+    DoubleBuffered = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    HotTrack = True
+    ParentBiDiMode = False
+    ParentDoubleBuffered = False
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = False
     TabOrder = 0
+    TabStop = False
     object tsRX: TTabSheet
       Caption = 'PLC'
     end

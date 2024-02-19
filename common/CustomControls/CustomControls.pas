@@ -16,6 +16,7 @@ type
     FError: Boolean;
 
     procedure ControlClick(Sender: TObject);
+    procedure ControlMouseEnter(Sender: TObject);
   published
     procedure SetValue(AValue: Variant);
   public
@@ -62,8 +63,10 @@ begin
   Self.Font.Color := clWhite;
 
   Self.ParentBackground := False;
+  Self.ShowHint := True;
 
   Self.OnClick := ControlClick;
+  Self.OnMouseEnter := ControlMouseEnter;
 end;
 
 procedure TAutomationControl.SetValue(AValue: Variant);
@@ -106,13 +109,6 @@ begin
   if Sender is TAutomationControl then
   begin
     try
-      if TAutomationControl(Sender).Caption <> '' then
-      begin
-        Clipboard.Clear;
-        Clipboard.AsText := TAutomationControl(Sender).Caption;
-      end;
-
-      // TEST TX
       LSignal := DMPLC.GetSignal(TAutomationControl(Sender).SignalID);
       if LSignal.SignalType = TSignalType.TX then
       begin
@@ -123,6 +119,20 @@ begin
       on E: Exception do
         MessageDlg(E.Message, mtError, [mbOk], 0);
     end;
+  end;
+end;
+
+procedure TAutomationControl.ControlMouseEnter(Sender: TObject);
+var
+  LHint: String;
+  LSignal: TSignal;
+begin
+  if Sender is TAutomationControl then
+  begin
+    LSignal := DMPLC.GetSignal(TAutomationControl(Sender).SignalID);
+    // sintassi indirizzo plc: DB10DBX20.0
+    LHint := Format('DB%dDBX%d.%d', [LSignal.DataBlock, LSignal.ByteIndex, LSignal.BitIndex]);
+    TAutomationControl(Sender).Hint := LHint;
   end;
 end;
 

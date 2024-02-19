@@ -43,7 +43,7 @@ uses
 constructor TFrameDebug.Create(AOwner: TComponent);
 begin
   inherited;
-
+  
   // Configrazioni base per il frame
   FConfig := GetConfiguration('Debug');
 
