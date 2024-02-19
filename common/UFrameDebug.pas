@@ -72,6 +72,8 @@ begin
 end;
 
 procedure TFrameDebug.GenerateControls(ASignalType: TSignalType);
+const
+  K_START_POS_MARGIN = 20;
 var
   I, Row, Column: Integer;
   Panel: TAutomationControl;
@@ -96,7 +98,13 @@ begin
     // Crea il pannello
     Panel := TAutomationControl.Create(LParent);
     Panel.Parent := LParent;
-    Panel.Left := FHorizontalMargin + Column * (FControlWidth + FHorizontalMargin);
+
+    // Posizionamento dinamico
+    if Column = 0 then
+      Panel.Left := K_START_POS_MARGIN
+    else 
+      Panel.Left := K_START_POS_MARGIN + (FHorizontalMargin * Column) + (Column * FControlWidth);
+      
     Panel.Top := FVerticalMargin + Row * (FControlHeight + FVerticalMargin);
     Panel.Width := FControlWidth;
     Panel.Height := FControlHeight;
