@@ -166,7 +166,7 @@ procedure TPLC.TXPLC;
 var
   i: Integer;
   signal: TSignal;
-  writeResult: Integer;
+  readResult, writeResult: Integer;
   buffer: TArray<Byte>;
 begin
   // Cicla attraverso ogni segnale
@@ -184,23 +184,29 @@ begin
     // Inizializza il buffer a zero per evitare valori non desiderati
     FillChar(buffer[0], Length(buffer), 0);
 
-    // Scrivi il valore del segnale nel buffer solo se la lunghezza del buffer è 1
-    if signal.SignalLength = 1 then
-      buffer[0] := signal.Value;
+    // Leggi il byte contenente il bit da modificare
+    readResult := daveReadBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, Length(buffer), @buffer[0]);
 
-    // Qui dovresti implementare la logica per convertire il valore del segnale in un array di byte
-    // e copiarlo nel buffer in base all'ordinamento dei byte richiesto dal PLC.
-    // Ad esempio, se il segnale è un intero a 16 bit, potresti fare qualcosa del genere:
-    // PWord(@buffer[0])^ := Swap(signal.Value);
+    if readResult = 0 then
+    begin
+      // Modifica il bit desiderato nel byte letto
+      if signal.Value = True then
+        buffer[0] := buffer[0] or (1 shl signal.BitIndex) // Imposta il bit a 1
+      else
+        buffer[0] := buffer[0] and not (1 shl signal.BitIndex); // Azzera il bit
 
-    // Scrivi i dati nel PLC utilizzando un buffer separato per ciascun segnale
-    writeResult := daveWriteBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, Length(buffer), @buffer[0]);
+      // Scrivi l'intero byte con la modifica nel PLC
+      writeResult := daveWriteBytes(FdC, daveDB, signal.DataBlock, signal.ByteIndex, 1, @buffer[0]);
 
-    // Verifico il risultato della scrittura
-    if writeResult = 0 then
-      signal.InError := False
-    else
+      // Verifica il risultato della scrittura
+      if writeResult = 0 then
+        signal.InError := False
+      else
+        signal.InError := True;
+    end else
       signal.InError := True;
+
+    FSignalCollection[i] := signal;
   end;
 end;
 
