@@ -131,7 +131,6 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\common\Utils.pas"/>
-        <DCCReference Include="..\..\common\plc\Plc.pas"/>
         <DCCReference Include="..\..\common\plc\UDmPlc.pas">
             <Form>DMPLC</Form>
             <DesignClass>TDataModule</DesignClass>
@@ -151,6 +150,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\..\common\Plc\plc.pas"/>
+        <DCCReference Include="..\source\plc.processor.project.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

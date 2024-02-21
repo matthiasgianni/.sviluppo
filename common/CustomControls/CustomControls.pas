@@ -29,8 +29,8 @@ type
   end;
 
 const
-  K_COLOR_TRUE = $005BF886;
-  K_COLOR_FALSE = $00057825;
+  K_COLOR_TRUE = $007EC86F;
+  K_COLOR_FALSE = $00507B2F;
 
 implementation
 

@@ -1,11 +1,10 @@
-// FOR TESTING TIA SIMULATOR SHOULD HAVE matthias AS INSTANCE
-
-unit Plc;
+unit plc;
 
 interface
 
 uses
-  nodave, Utils, System.SysUtils, System.Generics.Collections, System.Classes;
+  System.SysUtils, System.Generics.Collections, System.Classes, System.Variants, System.Rtti,
+  nodave, Utils;
 
 type
   TSignalType = (RX, TX);
@@ -20,13 +19,26 @@ type
     Value: Variant;
     Name: String;
     InError: Boolean;
+    ConstName: string;
   end;
-
   TSignalCollection = class(TList<TSignal>);
 
   TPLC = class(TObject)
+  public type
+    TPlcPollingThread = class(TThread)
+    private
+      FPLC: TPLC;
+      FInterval: Integer;
+      FFirstIteration: Boolean;
+      procedure DoPolling;
+    protected
+      procedure Execute; override;
+    public
+      constructor Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
+      destructor Destroy; override;
+    end;
+
   private
-    FConnected: Boolean;
     FdS: _daveOSserialType;
     FdI: pdaveInterface;
     FdC: pdaveConnection;
@@ -36,10 +48,15 @@ type
     FPLCSlot: Integer;
 
     FSignalCollection: TSignalCollection;
+    FThread: TPlcPollingThread;
+
+    FConnected: Boolean;
     FReadingError: string;
   public
-    property Connected: Boolean read FConnected write FConnected;
     property SignalCollection: TSignalCollection read FSignalCollection write FSignalCollection;
+    property Thread: TPlcPollingThread read FThread write FThread;
+
+    property Connected: Boolean read FConnected write FConnected;
     property ReadingError: string read FReadingError write FReadingError;
 
     procedure RXPLC;
@@ -48,19 +65,6 @@ type
     procedure Disconnect;
 
     constructor Create(AIp: String; ARack, ASlot: Integer); reintroduce;
-  end;
-
-  TPlcPollingThread = class(TThread)
-  private
-    FPLC: TPLC;
-    FInterval: Integer;
-    FFirstIteration: Boolean;
-    procedure DoPolling;
-  protected
-    procedure Execute; override;
-  public
-    constructor Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
-    destructor Destroy; override;
   end;
 
 implementation
@@ -144,7 +148,7 @@ begin
     begin
       if signal.SignalLength = 1 then
         // Aggiorna il valore del singolo bit nella lista
-        signal.Value := Ord((buffer[0] and (1 shl signal.BitIndex)) <> 0)
+        signal.Value := IntToBool(Ord((buffer[0] and (1 shl signal.BitIndex)) <> 0))
       else if signal.SignalLength = 2 then
         // Aggiorna il valore del dato a più byte nella lista
         signal.Value := Swap(PWord(@buffer[0])^)
@@ -212,7 +216,7 @@ end;
 
 { TPlcPollingThread }
 
-constructor TPlcPollingThread.Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
+constructor TPLC.TPlcPollingThread.Create(CreateSuspended: Boolean; APLC: TPLC; AInterval: Integer);
 begin
   inherited Create(CreateSuspended);
 
@@ -221,12 +225,12 @@ begin
   FInterval := AInterval;
 end;
 
-destructor TPlcPollingThread.Destroy;
+destructor TPLC.TPlcPollingThread.Destroy;
 begin
   inherited;
 end;
 
-procedure TPlcPollingThread.DoPolling;
+procedure TPLC.TPlcPollingThread.DoPolling;
 begin
   if not FPLC.Connected then
   begin
@@ -250,7 +254,7 @@ begin
   end;
 end;
 
-procedure TPlcPollingThread.Execute;
+procedure TPLC.TPlcPollingThread.Execute;
 begin
   FFirstIteration := True;
   while not Terminated do

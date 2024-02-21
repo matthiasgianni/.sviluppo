@@ -1,6 +1,6 @@
 {
   "signals": [
-  	{"Type": "RX", "DB": 120, "byte": 0, "bit": 0, "Name": "Presenza"},
-	{"Type": "TX", "DB": 121, "byte": 0, "bit": 0, "Name": "ACK Presenza"}	
+  	{"Type": "RX", "DB": 120, "byte": 0, "bit": 0, "Name": "Presenza", "ConstName": "RX_PRESENZA"},
+	{"Type": "TX", "DB": 121, "byte": 0, "bit": 0, "Name": "ACK Presenza", "ConstName": "TX_ACK_PRESENZA"}	
   ]
 }
